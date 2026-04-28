@@ -1,126 +1,96 @@
-let ministros = JSON.parse(localStorage.getItem("ministros")) || [];
-let escalas = JSON.parse(localStorage.getItem("escalas")) || [];
+// Firebase
+import { initializeApp } from "firebase/app";
+import { getFirestore, collection, addDoc, getDocs, query, where } from "firebase/firestore";
 
-let hoje = new Date();
-let mesAtual = hoje.getMonth();
-let anoAtual = hoje.getFullYear();
+const firebaseConfig = {
+  apiKey: "AIzaSyBr6qDi7cyirnC_akb134OAzjFxTOdGY4U",
+  authDomain: "douro-acessorios.firebaseapp.com",
+  projectId: "douro-acessorios",
+  storageBucket: "douro-acessorios.firebasestorage.app",
+  messagingSenderId: "281702603904",
+  appId: "1:281702603904:web:0aeda1db82e9e211635a65"
+};
 
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// LOGIN SIMPLES
 function login(){
 let u = document.getElementById("user").value;
 let s = document.getElementById("pass").value;
 
-if(u === "admin" && s === "saojorge"){
-document.getElementById("loginBox").style.display = "none";
+if(u==="admin" && s==="saojorge"){
+document.getElementById("loginBox").style.display="none";
 document.getElementById("painel").classList.remove("hidden");
-carregarSelect();
 }else{
-alert("Usuário ou senha inválidos");
+alert("Login inválido");
 }
 }
 
-function salvarMinistro(){
+// SALVAR MINISTRO
+async function salvarMinistro(){
+
 let nome = document.getElementById("nome").value;
 let fone = document.getElementById("fone").value;
 
-if(nome=="") return alert("Digite o nome");
+await addDoc(collection(db,"ministros"),{
+nome,
+fone
+});
 
-ministros.push({nome,fone});
-localStorage.setItem("ministros", JSON.stringify(ministros));
-
-document.getElementById("nome").value="";
-document.getElementById("fone").value="";
-
-carregarSelect();
-alert("Ministro cadastrado!");
+alert("Ministro salvo no Firebase!");
 }
 
-function carregarSelect(){
+// CARREGAR MINISTROS
+async function carregarSelect(){
+
 let select = document.getElementById("ministroEscala");
 if(!select) return;
 
 select.innerHTML="";
 
-ministros.forEach(m=>{
+const snapshot = await getDocs(collection(db,"ministros"));
+
+snapshot.forEach(doc=>{
+let m = doc.data();
 select.innerHTML += `<option>${m.nome}</option>`;
 });
 }
 
-function salvarEscala(){
+// SALVAR ESCALA
+async function salvarEscala(){
+
 let data = document.getElementById("dataEscala").value;
 let hora = document.getElementById("horaEscala").value;
 let ministro = document.getElementById("ministroEscala").value;
 
-if(data=="" || hora=="") return alert("Preencha tudo");
+await addDoc(collection(db,"escalas"),{
+data,
+hora,
+ministro
+});
 
-escalas.push({data,hora,ministro});
-localStorage.setItem("escalas", JSON.stringify(escalas));
-
-alert("Escala salva!");
-gerarCalendario();
+alert("Escala salva no Firebase!");
 }
 
-function gerarCalendario(){
+// VER ESCALA POR DIA
+async function verDiaFirebase(data){
 
-let nomesMeses = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+const q = query(collection(db,"escalas"), where("data","==",data));
 
-let titulo = document.getElementById("mesAno");
-let calendario = document.getElementById("calendario");
-
-if(!titulo || !calendario) return;
-
-titulo.innerText = nomesMeses[mesAtual] + " " + anoAtual;
-calendario.innerHTML="";
-
-let primeiroDia = new Date(anoAtual, mesAtual, 1).getDay();
-let totalDias = new Date(anoAtual, mesAtual + 1, 0).getDate();
-
-for(let i=0;i<primeiroDia;i++){
-calendario.innerHTML += `<div></div>`;
-}
-
-for(let dia=1; dia<=totalDias; dia++){
-
-let data = `${anoAtual}-${String(mesAtual+1).padStart(2,'0')}-${String(dia).padStart(2,'0')}`;
-
-let temEscala = escalas.some(e => e.data === data);
-
-let classe = "dia";
-
-if(temEscala) classe += " comEscala";
-
-if(
-dia===hoje.getDate() &&
-mesAtual===hoje.getMonth() &&
-anoAtual===hoje.getFullYear()
-){
-classe += " hoje";
-}
-
-calendario.innerHTML += `
-<div class="${classe}" onclick="verDia('${data}')">
-${dia}
-</div>
-`;
-}
-}
-
-function verDia(data){
+const snapshot = await getDocs(q);
 
 let box = document.getElementById("detalhesDia");
-if(!box) return;
+box.innerHTML = `<h3>${data}</h3>`;
 
-let lista = escalas.filter(e => e.data === data);
-
-if(lista.length===0){
-box.innerHTML = `<h3>${data}</h3>Nenhuma escala neste dia.`;
+if(snapshot.empty){
+box.innerHTML += "Nenhuma escala.";
 return;
 }
 
-lista.sort((a,b)=>a.hora.localeCompare(b.hora));
+snapshot.forEach(doc=>{
+let e = doc.data();
 
-box.innerHTML = `<h3>${data}</h3>`;
-
-lista.forEach(e=>{
 box.innerHTML += `
 <div class="itemEscala">
 <strong>${e.hora}</strong> - ${e.ministro}
@@ -128,23 +98,3 @@ box.innerHTML += `
 `;
 });
 }
-
-function mesAnterior(){
-mesAtual--;
-if(mesAtual<0){
-mesAtual=11;
-anoAtual--;
-}
-gerarCalendario();
-}
-
-function proximoMes(){
-mesAtual++;
-if(mesAtual>11){
-mesAtual=0;
-anoAtual++;
-}
-gerarCalendario();
-}
-
-gerarCalendario();
