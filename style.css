@@ -1,82 +1,137 @@
 body{
-font-family:Arial;
 margin:0;
-background:#f2f5fa;
+font-family:Arial;
+background:#eef3f9;
 }
 
 header{
 background:#0d47a1;
 color:white;
+padding:20px;
 text-align:center;
-padding:20px;
-border-bottom:4px solid #d4af37;
 }
 
-section{
+.container{
+display:flex;
+gap:20px;
+padding:20px;
+}
+
+.card{
 background:white;
-margin:20px;
-padding:20px;
 border-radius:12px;
-box-shadow:0 4px 10px rgba(0,0,0,0.1);
+padding:15px;
+box-shadow:0 4px 10px rgba(0,0,0,0.08);
 }
 
-input,button{
+.left{
+flex:1;
+}
+
+.right{
+flex:1.2;
+}
+
+input{
 width:100%;
-padding:12px;
-margin:6px 0;
+padding:8px;
+margin:5px 0;
 border-radius:8px;
 border:1px solid #ccc;
+font-size:14px;
 }
 
 button{
+width:100%;
+padding:10px;
+margin-top:8px;
+border:none;
+border-radius:8px;
+cursor:pointer;
 background:#0d47a1;
 color:white;
-border:none;
-cursor:pointer;
+font-weight:bold;
 }
 
 button:hover{
 background:#1565c0;
 }
 
-.hidden{display:none;}
-
-.cal-header{
+.ministro-item{
 display:flex;
 justify-content:space-between;
-align-items:center;
+padding:8px;
+background:#f6f8ff;
+margin:5px 0;
+border-radius:8px;
 }
 
-#calendario{
-display:grid;
-grid-template-columns:repeat(7,1fr);
-gap:6px;
+.ministro-actions button{
+width:auto;
+padding:5px 8px;
+margin-left:5px;
+font-size:12px;
+}
+
+.checkbox-list{
+max-height:150px;
+overflow:auto;
+border:1px solid #ddd;
+padding:8px;
+border-radius:8px;
+}
+
+.table{
+width:100%;
+border-collapse:collapse;
 margin-top:10px;
 }
 
-.dia{
-background:#eef3ff;
-padding:15px;
+.table th{
+background:#0d47a1;
+color:white;
+padding:8px;
+}
+
+.table td{
+padding:8px;
+border-bottom:1px solid #eee;
+}
+
+.calendar-header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:10px;
+}
+
+.nav-btn{
+width:40px;
+height:40px;
+border-radius:50%;
+font-size:18px;
+}
+
+.dias{
+display:grid;
+grid-template-columns:repeat(7,1fr);
+gap:5px;
+}
+
+.day{
+background:#fff;
+padding:10px;
 text-align:center;
 border-radius:8px;
 cursor:pointer;
+transition:0.2s;
 }
 
-.comEscala{
+.day:hover{
+background:#dbe7ff;
+}
+
+.active{
 background:#0d47a1;
 color:white;
-}
-
-#detalhesDia{
-margin-top:20px;
-padding:10px;
-background:#f8f9ff;
-border-radius:10px;
-}
-
-.itemEscala{
-padding:8px;
-margin:5px 0;
-background:white;
-border-left:4px solid #d4af37;
 }
