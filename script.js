@@ -1,4 +1,4 @@
-// CONFIG FIREBASE (SEU PROJETO)
+// FIREBASE CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyBr6qDi7cyirnC_akb134OAzjFxTOdGY4U",
   authDomain: "douro-acessorios.firebaseapp.com",
@@ -11,21 +11,24 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+let hoje = new Date();
+let mes = hoje.getMonth();
+let ano = hoje.getFullYear();
+
+
 // LOGIN
 function login(){
-let u = user.value;
-let s = pass.value;
-
-if(u==="admin" && s==="saojorge"){
+if(user.value==="admin" && pass.value==="saojorge"){
 loginBox.style.display="none";
 painel.classList.remove("hidden");
 carregarMinistros();
+listarEscalas();
 }else{
 alert("Erro login");
 }
 }
 
-// SALVAR MINISTRO
+// MINISTROS
 function salvarMinistro(){
 db.collection("ministros").add({
 nome:nome.value,
@@ -35,35 +38,69 @@ alert("Salvo!");
 carregarMinistros();
 }
 
-// CARREGAR MINISTROS
+// CHECKBOX MINISTROS
 function carregarMinistros(){
-let sel = document.getElementById("ministroEscala");
-if(!sel) return;
+let div = document.getElementById("listaCheckbox");
+if(!div) return;
 
-sel.innerHTML="";
+div.innerHTML="";
 
-db.collection("ministros").get().then(snapshot=>{
-snapshot.forEach(doc=>{
-sel.innerHTML += `<option>${doc.data().nome}</option>`;
+db.collection("ministros").get().then(snap=>{
+snap.forEach(doc=>{
+let m = doc.data();
+
+div.innerHTML += `
+<label>
+<input type="checkbox" value="${m.nome}">
+${m.nome}
+</label><br>
+`;
 });
 });
 }
 
 // SALVAR ESCALA
 function salvarEscala(){
+
+let selecionados = [];
+
+document.querySelectorAll("#listaCheckbox input:checked")
+.forEach(i=>selecionados.push(i.value));
+
 db.collection("escalas").add({
 data:dataEscala.value,
 hora:horaEscala.value,
-ministro:ministroEscala.value
+ministros:selecionados
 });
+
 alert("Escala salva!");
+listarEscalas();
+}
+
+// LISTA TABELA
+function listarEscalas(){
+
+let tb = document.getElementById("tabelaEscalas");
+if(!tb) return;
+
+tb.innerHTML="";
+
+db.collection("escalas").get().then(snap=>{
+snap.forEach(doc=>{
+let e = doc.data();
+
+tb.innerHTML += `
+<tr>
+<td>${e.data}</td>
+<td>${e.hora}</td>
+<td>${e.ministros.join(", ")}</td>
+</tr>
+`;
+});
+});
 }
 
 // CALENDÁRIO
-let hoje = new Date();
-let mes = hoje.getMonth();
-let ano = hoje.getFullYear();
-
 function gerarCalendario(){
 
 mesAno.innerText = new Date(ano,mes).toLocaleString('pt-BR',{month:'long',year:'numeric'});
@@ -77,13 +114,10 @@ for(let i=0;i<primeiro;i++){
 calendario.innerHTML+="<div></div>";
 }
 
-db.collection("escalas").get().then(snapshot=>{
+db.collection("escalas").get().then(snap=>{
 
-let dados = [];
-
-snapshot.forEach(doc=>{
-dados.push(doc.data());
-});
+let dados=[];
+snap.forEach(d=>dados.push(d.data()));
 
 for(let d=1;d<=total;d++){
 
@@ -102,25 +136,26 @@ ${d}
 // VER DIA
 function verDia(data){
 
-db.collection("escalas").where("data","==",data).get().then(snapshot=>{
+db.collection("escalas").where("data","==",data).get().then(snap=>{
 
 detalhesDia.innerHTML=`<h3>${data}</h3>`;
 
-snapshot.forEach(doc=>{
+snap.forEach(doc=>{
 let e = doc.data();
 
 detalhesDia.innerHTML += `
 <div class="itemEscala">
-${e.hora} - ${e.ministro}
+${e.hora} - ${e.ministros.join(", ")}
 </div>`;
 });
 
-if(snapshot.empty){
+if(snap.empty){
 detalhesDia.innerHTML+="Sem escala";
 }
 });
 }
 
+// MES
 function mesAnterior(){
 mes--;
 if(mes<0){mes=11;ano--;}
