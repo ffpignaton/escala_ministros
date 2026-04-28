@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Administração - Escalas</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+<h1>Paróquia Santíssima Trindade</h1>
+<h2>Painel Administrativo</h2>
+</header>
+
+<section class="login" id="loginBox">
+<h3>Login Administrativo</h3>
+
+<input type="text" id="user" placeholder="Usuário">
+<input type="password" id="pass" placeholder="Senha">
+
+<button onclick="login()">Entrar</button>
+</section>
+
+<section id="painel" class="hidden">
+
+<h3>Cadastrar Ministro</h3>
+
+<input type="text" id="nome" placeholder="Nome do Ministro">
+<input type="text" id="fone" placeholder="Telefone">
+
+<button onclick="salvarMinistro()">Salvar Ministro</button>
+
+<hr>
+
+<h3>Criar Escala</h3>
+
+<input type="date" id="dataEscala">
+<input type="time" id="horaEscala">
+
+<select id="ministroEscala"></select>
+
+<button onclick="salvarEscala()">Salvar Escala</button>
+
+</section>
+
+<script src="script.js"></script>
+</body>
+</html>
