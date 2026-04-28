@@ -1,7 +1,4 @@
-// Firebase
-import { initializeApp } from "firebase/app";
-import { getFirestore, collection, addDoc, getDocs, query, where } from "firebase/firestore";
-
+// CONFIG FIREBASE (SEU PROJETO)
 const firebaseConfig = {
   apiKey: "AIzaSyBr6qDi7cyirnC_akb134OAzjFxTOdGY4U",
   authDomain: "douro-acessorios.firebaseapp.com",
@@ -11,90 +8,129 @@ const firebaseConfig = {
   appId: "1:281702603904:web:0aeda1db82e9e211635a65"
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-// LOGIN SIMPLES
+// LOGIN
 function login(){
-let u = document.getElementById("user").value;
-let s = document.getElementById("pass").value;
+let u = user.value;
+let s = pass.value;
 
 if(u==="admin" && s==="saojorge"){
-document.getElementById("loginBox").style.display="none";
-document.getElementById("painel").classList.remove("hidden");
+loginBox.style.display="none";
+painel.classList.remove("hidden");
+carregarMinistros();
 }else{
-alert("Login inválido");
+alert("Erro login");
 }
 }
 
 // SALVAR MINISTRO
-async function salvarMinistro(){
-
-let nome = document.getElementById("nome").value;
-let fone = document.getElementById("fone").value;
-
-await addDoc(collection(db,"ministros"),{
-nome,
-fone
+function salvarMinistro(){
+db.collection("ministros").add({
+nome:nome.value,
+fone:fone.value
 });
-
-alert("Ministro salvo no Firebase!");
+alert("Salvo!");
+carregarMinistros();
 }
 
 // CARREGAR MINISTROS
-async function carregarSelect(){
+function carregarMinistros(){
+let sel = document.getElementById("ministroEscala");
+if(!sel) return;
 
-let select = document.getElementById("ministroEscala");
-if(!select) return;
+sel.innerHTML="";
 
-select.innerHTML="";
-
-const snapshot = await getDocs(collection(db,"ministros"));
-
+db.collection("ministros").get().then(snapshot=>{
 snapshot.forEach(doc=>{
-let m = doc.data();
-select.innerHTML += `<option>${m.nome}</option>`;
+sel.innerHTML += `<option>${doc.data().nome}</option>`;
+});
 });
 }
 
 // SALVAR ESCALA
-async function salvarEscala(){
+function salvarEscala(){
+db.collection("escalas").add({
+data:dataEscala.value,
+hora:horaEscala.value,
+ministro:ministroEscala.value
+});
+alert("Escala salva!");
+}
 
-let data = document.getElementById("dataEscala").value;
-let hora = document.getElementById("horaEscala").value;
-let ministro = document.getElementById("ministroEscala").value;
+// CALENDÁRIO
+let hoje = new Date();
+let mes = hoje.getMonth();
+let ano = hoje.getFullYear();
 
-await addDoc(collection(db,"escalas"),{
-data,
-hora,
-ministro
+function gerarCalendario(){
+
+mesAno.innerText = new Date(ano,mes).toLocaleString('pt-BR',{month:'long',year:'numeric'});
+
+calendario.innerHTML="";
+
+let primeiro = new Date(ano,mes,1).getDay();
+let total = new Date(ano,mes+1,0).getDate();
+
+for(let i=0;i<primeiro;i++){
+calendario.innerHTML+="<div></div>";
+}
+
+db.collection("escalas").get().then(snapshot=>{
+
+let dados = [];
+
+snapshot.forEach(doc=>{
+dados.push(doc.data());
 });
 
-alert("Escala salva no Firebase!");
+for(let d=1;d<=total;d++){
+
+let data = `${ano}-${String(mes+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+
+let tem = dados.some(e=>e.data===data);
+
+calendario.innerHTML += `
+<div class="dia ${tem?'comEscala':''}" onclick="verDia('${data}')">
+${d}
+</div>`;
+}
+});
 }
 
-// VER ESCALA POR DIA
-async function verDiaFirebase(data){
+// VER DIA
+function verDia(data){
 
-const q = query(collection(db,"escalas"), where("data","==",data));
+db.collection("escalas").where("data","==",data).get().then(snapshot=>{
 
-const snapshot = await getDocs(q);
-
-let box = document.getElementById("detalhesDia");
-box.innerHTML = `<h3>${data}</h3>`;
-
-if(snapshot.empty){
-box.innerHTML += "Nenhuma escala.";
-return;
-}
+detalhesDia.innerHTML=`<h3>${data}</h3>`;
 
 snapshot.forEach(doc=>{
 let e = doc.data();
 
-box.innerHTML += `
+detalhesDia.innerHTML += `
 <div class="itemEscala">
-<strong>${e.hora}</strong> - ${e.ministro}
-</div>
-`;
+${e.hora} - ${e.ministro}
+</div>`;
+});
+
+if(snapshot.empty){
+detalhesDia.innerHTML+="Sem escala";
+}
 });
 }
+
+function mesAnterior(){
+mes--;
+if(mes<0){mes=11;ano--;}
+gerarCalendario();
+}
+
+function proximoMes(){
+mes++;
+if(mes>11){mes=0;ano++;}
+gerarCalendario();
+}
+
+gerarCalendario();
