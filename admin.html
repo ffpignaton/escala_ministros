@@ -2,10 +2,8 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Admin Escalas</title>
+<title>Painel Admin</title>
 <link rel="stylesheet" href="style.css">
-
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 </head>
@@ -13,51 +11,55 @@
 <body>
 
 <header>
-<h1>Painel Admin</h1>
 <h2>Paróquia Santíssima Trindade</h2>
+<h3>Painel Administrativo</h3>
 </header>
 
-<section class="login" id="loginBox">
-<h3>Login</h3>
-<input id="user" placeholder="Usuário">
-<input id="pass" type="password" placeholder="Senha">
-<button onclick="login()">Entrar</button>
-</section>
+<div class="container">
 
-<section id="painel" class="hidden">
+<!-- ESQUERDA -->
+<div class="card left">
 
-<h3>Cadastrar Ministro</h3>
+<h3>Ministros</h3>
+
 <input id="nome" placeholder="Nome">
 <input id="fone" placeholder="Telefone">
-<button onclick="salvarMinistro()">Salvar</button>
+<button onclick="salvarMinistro()">Adicionar Ministro</button>
 
-<hr>
+<div id="listaMinistros"></div>
 
-<h3>Escala (múltiplos ministros)</h3>
+</div>
+
+<!-- DIREITA -->
+<div class="card right">
+
+<h3>Escala</h3>
 
 <input type="date" id="dataEscala">
 <input type="time" id="horaEscala">
 
-<div id="listaCheckbox"></div>
+<h4>Selecionar Ministros</h4>
+<div class="checkbox-list" id="checkboxes"></div>
 
 <button onclick="salvarEscala()">Salvar Escala</button>
 
-<hr>
-
 <h3>Escalas Criadas</h3>
 
-<table border="1" width="100%">
+<table class="table">
 <thead>
 <tr>
 <th>Data</th>
 <th>Hora</th>
 <th>Ministros</th>
+<th>Ações</th>
 </tr>
 </thead>
-<tbody id="tabelaEscalas"></tbody>
+<tbody id="tabela"></tbody>
 </table>
 
-</section>
+</div>
+
+</div>
 
 <script src="script.js"></script>
 </body>
