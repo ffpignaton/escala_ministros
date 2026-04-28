@@ -3,8 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Escalas dos Ministros</title>
+<title>Escalas</title>
 <link rel="stylesheet" href="style.css">
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
 </head>
 <body>
 
@@ -14,7 +18,7 @@
 </header>
 
 <section>
-<h3>Escala dos Ministros da Eucaristia</h3>
+<h3>Calendário</h3>
 
 <div class="cal-header">
 <button onclick="mesAnterior()">◀</button>
@@ -25,6 +29,7 @@
 <div id="calendario"></div>
 
 <div id="detalhesDia"></div>
+
 </section>
 
 <script src="script.js"></script>
