@@ -8,7 +8,7 @@ color:#222;
 
 header{
 background:#0d47a1;
-color:white;
+color:#fff;
 text-align:center;
 padding:20px;
 border-bottom:4px solid #d4af37;
@@ -26,11 +26,16 @@ font-weight:normal;
 }
 
 section{
-background:white;
+background:#fff;
 margin:20px;
 padding:20px;
 border-radius:14px;
 box-shadow:0 4px 10px rgba(0,0,0,0.08);
+}
+
+.login{
+max-width:400px;
+margin:auto;
 }
 
 input,select,button{
@@ -62,8 +67,8 @@ display:none;
 display:flex;
 justify-content:space-between;
 align-items:center;
-margin-bottom:15px;
 gap:10px;
+margin-bottom:15px;
 }
 
 .cal-header button{
@@ -111,9 +116,4 @@ margin:8px 0;
 background:white;
 border-left:5px solid #d4af37;
 border-radius:6px;
-}
-
-.login{
-max-width:400px;
-margin:auto;
 }
