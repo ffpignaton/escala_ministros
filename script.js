@@ -14,7 +14,7 @@ document.getElementById("loginBox").style.display = "none";
 document.getElementById("painel").classList.remove("hidden");
 carregarSelect();
 }else{
-alert("Login inválido");
+alert("Usuário ou senha inválidos");
 }
 }
 
@@ -22,7 +22,7 @@ function salvarMinistro(){
 let nome = document.getElementById("nome").value;
 let fone = document.getElementById("fone").value;
 
-if(nome=="") return alert("Digite nome");
+if(nome=="") return alert("Digite o nome");
 
 ministros.push({nome,fone});
 localStorage.setItem("ministros", JSON.stringify(ministros));
@@ -31,15 +31,17 @@ document.getElementById("nome").value="";
 document.getElementById("fone").value="";
 
 carregarSelect();
-alert("Ministro salvo!");
+alert("Ministro cadastrado!");
 }
 
 function carregarSelect(){
-let s = document.getElementById("ministroEscala");
-s.innerHTML="";
+let select = document.getElementById("ministroEscala");
+if(!select) return;
+
+select.innerHTML="";
 
 ministros.forEach(m=>{
-s.innerHTML += `<option>${m.nome}</option>`;
+select.innerHTML += `<option>${m.nome}</option>`;
 });
 }
 
@@ -53,22 +55,24 @@ if(data=="" || hora=="") return alert("Preencha tudo");
 escalas.push({data,hora,ministro});
 localStorage.setItem("escalas", JSON.stringify(escalas));
 
-gerarCalendario();
 alert("Escala salva!");
+gerarCalendario();
 }
 
 function gerarCalendario(){
 
-let meses = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+let nomesMeses = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
 
-document.getElementById("mesAno").innerText =
-meses[mesAtual] + " " + anoAtual;
-
+let titulo = document.getElementById("mesAno");
 let calendario = document.getElementById("calendario");
+
+if(!titulo || !calendario) return;
+
+titulo.innerText = nomesMeses[mesAtual] + " " + anoAtual;
 calendario.innerHTML="";
 
-let primeiroDia = new Date(anoAtual, mesAtual,1).getDay();
-let totalDias = new Date(anoAtual, mesAtual+1,0).getDate();
+let primeiroDia = new Date(anoAtual, mesAtual, 1).getDay();
+let totalDias = new Date(anoAtual, mesAtual + 1, 0).getDate();
 
 for(let i=0;i<primeiroDia;i++){
 calendario.innerHTML += `<div></div>`;
@@ -76,9 +80,9 @@ calendario.innerHTML += `<div></div>`;
 
 for(let dia=1; dia<=totalDias; dia++){
 
-let dataTexto = `${anoAtual}-${String(mesAtual+1).padStart(2,'0')}-${String(dia).padStart(2,'0')}`;
+let data = `${anoAtual}-${String(mesAtual+1).padStart(2,'0')}-${String(dia).padStart(2,'0')}`;
 
-let temEscala = escalas.some(e=>e.data===dataTexto);
+let temEscala = escalas.some(e => e.data === data);
 
 let classe = "dia";
 
@@ -93,7 +97,7 @@ classe += " hoje";
 }
 
 calendario.innerHTML += `
-<div class="${classe}" onclick="verDia('${dataTexto}')">
+<div class="${classe}" onclick="verDia('${data}')">
 ${dia}
 </div>
 `;
@@ -102,12 +106,13 @@ ${dia}
 
 function verDia(data){
 
-let lista = escalas.filter(e=>e.data===data);
-
 let box = document.getElementById("detalhesDia");
+if(!box) return;
+
+let lista = escalas.filter(e => e.data === data);
 
 if(lista.length===0){
-box.innerHTML = `<h3>${data}</h3>Nenhuma escala.`;
+box.innerHTML = `<h3>${data}</h3>Nenhuma escala neste dia.`;
 return;
 }
 
