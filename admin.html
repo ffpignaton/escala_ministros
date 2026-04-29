@@ -3,12 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Painel Admin</title>
+<title>Painel Administrativo</title>
 
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="css/admin.css">
 
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+<script src="js/firebase.js"></script>
 </head>
 
 <body>
@@ -20,25 +22,14 @@
 
 <h2>⛪ Escalas</h2>
 
-<div class="menu-item" onclick="abrirTela('dashboard')">
-📋 Dashboard
-</div>
-
-<div class="menu-item" onclick="abrirTela('ministros')">
-👥 Ministros
-</div>
-
-<div class="menu-item" onclick="abrirTela('escalas')">
-📅 Escalas
-</div>
-
-<div class="menu-item" onclick="abrirTela('relatorios')">
-📄 Relatórios
-</div>
+<div class="menu-item" onclick="abrirTela('dashboard')">📋 Dashboard</div>
+<div class="menu-item" onclick="abrirTela('ministros')">👥 Ministros</div>
+<div class="menu-item" onclick="abrirTela('escalas')">📅 Escalas</div>
+<div class="menu-item" onclick="abrirTela('relatorios')">📄 Relatórios</div>
 
 </div>
 
-<!-- CONTEÚDO -->
+<!-- CONTEUDO -->
 <div class="main">
 
 <header>
@@ -48,29 +39,31 @@
 
 <!-- DASHBOARD -->
 <section id="dashboard" class="tela">
-
 <div class="card">
 <h3>Bem-vindo</h3>
-<p>Use o menu lateral para administrar ministros e escalas.</p>
+<p>Sistema de escalas dos ministros.</p>
 </div>
-
 </section>
 
 <!-- MINISTROS -->
 <section id="ministros" class="tela hidden">
 
 <div class="card">
-<h3>👥 Cadastro de Ministro</h3>
+<h3>Cadastro de Ministro</h3>
 
 <input id="nome" placeholder="Nome">
-<input id="fone" placeholder="(00)00000-0000" maxlength="14" oninput="mascaraTelefone(this)">
+
+<input id="fone"
+placeholder="(00)00000-0000"
+maxlength="14"
+oninput="mascaraTelefone(this)">
 
 <button onclick="salvarMinistro()">Salvar Ministro</button>
+
 </div>
 
 <div class="card">
 <h3>Lista de Ministros</h3>
-
 <div id="listaMinistros"></div>
 </div>
 
@@ -80,7 +73,7 @@
 <section id="escalas" class="tela hidden">
 
 <div class="card">
-<h3>📅 Criar Escala</h3>
+<h3>Criar Escala</h3>
 
 <input type="date" id="dataEscala">
 <input type="time" id="horaEscala">
@@ -88,6 +81,7 @@
 <div id="seletorMinistros" class="tags-box"></div>
 
 <button onclick="salvarEscala()">Salvar Escala</button>
+
 </div>
 
 <div class="card">
@@ -114,8 +108,8 @@
 <section id="relatorios" class="tela hidden">
 
 <div class="card">
-<h3>📄 Relatórios</h3>
-<p>Área preparada para PDF e exportações.</p>
+<h3>Relatórios</h3>
+<p>Área pronta para PDF.</p>
 </div>
 
 </section>
@@ -123,7 +117,7 @@
 </div>
 </div>
 
-<script src="script.js"></script>
+<script src="js/admin.js"></script>
 
 </body>
 </html>
