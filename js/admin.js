@@ -365,6 +365,12 @@ start:e.data
 
 }
 
+function gerarPDF(){
+
+alert("PDF funcionando com sucesso!");
+
+}
+
 /* =========================
 INICIAR
 ========================= */
