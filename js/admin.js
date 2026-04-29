@@ -93,14 +93,12 @@ let m = doc.data();
 
 lista.innerHTML += `
 <div class="ministro-item">
-
 <div>
 <strong>${m.nome}</strong><br>
 <small>${m.fone || ""}</small>
 </div>
 
 <div class="actions">
-
 <button class="small-btn"
 onclick="editarMinistro('${doc.id}','${m.nome}','${m.fone || ""}')">
 Editar
@@ -110,7 +108,6 @@ Editar
 onclick="deletarMinistro('${doc.id}')">
 Excluir
 </button>
-
 </div>
 </div>
 `;
@@ -123,10 +120,10 @@ Excluir
 
 function editarMinistro(id,nomeAtual,foneAtual){
 
-let novoNome = prompt("Nome:",nomeAtual);
+let novoNome = prompt("Nome:", nomeAtual);
 if(novoNome===null) return;
 
-let novoFone = prompt("Telefone:",foneAtual);
+let novoFone = prompt("Telefone:", foneAtual);
 
 db.collection("ministros").doc(id).update({
 nome:novoNome,
@@ -154,7 +151,6 @@ ESCALAS
 function carregarSeletorMinistros(){
 
 const box = document.getElementById("seletorMinistros");
-
 box.innerHTML="";
 ministrosSelecionados=[];
 
@@ -267,10 +263,10 @@ Excluir
 
 function editarEscala(id,dataAtual,horaAtual){
 
-let novaData = prompt("Nova data:",dataAtual);
+let novaData = prompt("Nova data:", dataAtual);
 if(novaData===null) return;
 
-let novaHora = prompt("Nova hora:",horaAtual);
+let novaHora = prompt("Nova hora:", horaAtual);
 
 db.collection("escalas").doc(id).update({
 data:novaData,
@@ -295,7 +291,7 @@ atualizarCalendarioAdmin();
 }
 
 /* =========================
-FULLCALENDAR
+CALENDÁRIO ADMIN
 ========================= */
 function iniciarCalendarioAdmin(){
 
@@ -365,24 +361,58 @@ start:e.data
 
 }
 
+/* =========================
+PDF REAL COM ESCALAS
+========================= */
 function gerarPDF(){
 
-const { jsPDF } = window.jspdf;
+db.collection("escalas").orderBy("data").get().then(snapshot=>{
 
+const { jsPDF } = window.jspdf;
 const doc = new jsPDF();
 
+let y = 20;
+
 doc.setFontSize(18);
-doc.text("Paróquia Santíssima Trindade", 20, 20);
+doc.text("Paróquia Santíssima Trindade",20,y);
+
+y += 10;
 
 doc.setFontSize(14);
-doc.text("Escala dos Ministros", 20, 35);
+doc.text("Escala dos Ministros",20,y);
 
-doc.setFontSize(12);
-doc.text("Documento gerado pelo sistema.", 20, 50);
+y += 15;
+
+doc.setFontSize(11);
+
+if(snapshot.empty){
+doc.text("Nenhuma escala cadastrada.",20,y);
+}else{
+
+snapshot.forEach(item=>{
+
+let e = item.data();
+
+doc.text(
+`${e.data} - ${e.hora} - ${e.ministros.join(", ")}`,
+20,
+y
+);
+
+y += 8;
+
+if(y > 270){
+doc.addPage();
+y = 20;
+}
+
+});
+
+}
 
 doc.save("escala-ministros.pdf");
 
-}
+});
 
 }
 
