@@ -367,8 +367,6 @@ start:e.data
 
 function gerarPDF(){
 
-function gerarPDF(){
-
 const { jsPDF } = window.jspdf;
 
 const doc = new jsPDF();
