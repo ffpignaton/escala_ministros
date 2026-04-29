@@ -1,6 +1,9 @@
 let ministrosSelecionados = [];
+let calendarAdmin = null;
 
-/* TELAS */
+/* =========================
+TELAS
+========================= */
 function abrirTela(id){
 
 document.querySelectorAll(".tela").forEach(t=>{
@@ -16,36 +19,41 @@ carregarMinistros();
 if(id==="escalas"){
 carregarSeletorMinistros();
 listarEscalas();
+iniciarCalendarioAdmin();
 }
 
 }
 
-/* TELEFONE */
+/* =========================
+TELEFONE
+========================= */
 function mascaraTelefone(campo){
 
 let v = campo.value.replace(/\D/g,'');
 
-if(v.length>11){
-v=v.slice(0,11);
+if(v.length > 11){
+v = v.slice(0,11);
 }
 
-if(v.length>0){
-v="("+v;
+if(v.length > 0){
+v = "(" + v;
 }
 
-if(v.length>3){
-v=v.slice(0,3)+")"+v.slice(3);
+if(v.length > 3){
+v = v.slice(0,3) + ")" + v.slice(3);
 }
 
-if(v.length>9){
-v=v.slice(0,9)+"-"+v.slice(9);
+if(v.length > 9){
+v = v.slice(0,9) + "-" + v.slice(9);
 }
 
-campo.value=v;
+campo.value = v;
 
 }
 
-/* MINISTROS */
+/* =========================
+MINISTROS
+========================= */
 function salvarMinistro(){
 
 let nome = document.getElementById("nome").value.trim();
@@ -65,6 +73,8 @@ document.getElementById("nome").value="";
 document.getElementById("fone").value="";
 
 carregarMinistros();
+
+alert("Ministro salvo!");
 
 });
 
@@ -90,6 +100,7 @@ lista.innerHTML += `
 </div>
 
 <div class="actions">
+
 <button class="small-btn"
 onclick="editarMinistro('${doc.id}','${m.nome}','${m.fone || ""}')">
 Editar
@@ -99,8 +110,8 @@ Editar
 onclick="deletarMinistro('${doc.id}')">
 Excluir
 </button>
-</div>
 
+</div>
 </div>
 `;
 
@@ -137,7 +148,9 @@ carregarMinistros();
 
 }
 
-/* ESCALAS */
+/* =========================
+ESCALAS
+========================= */
 function carregarSeletorMinistros(){
 
 const box = document.getElementById("seletorMinistros");
@@ -202,8 +215,13 @@ data,
 hora,
 ministros:ministrosSelecionados
 }).then(()=>{
+
 listarEscalas();
 carregarSeletorMinistros();
+atualizarCalendarioAdmin();
+
+alert("Escala salva!");
+
 });
 
 }
@@ -259,6 +277,7 @@ data:novaData,
 hora:novaHora
 }).then(()=>{
 listarEscalas();
+atualizarCalendarioAdmin();
 });
 
 }
@@ -270,11 +289,85 @@ if(!confirm("Excluir escala?")) return;
 db.collection("escalas").doc(id).delete()
 .then(()=>{
 listarEscalas();
+atualizarCalendarioAdmin();
 });
 
 }
 
-/* INICIAR */
+/* =========================
+FULLCALENDAR
+========================= */
+function iniciarCalendarioAdmin(){
+
+if(calendarAdmin){
+calendarAdmin.render();
+atualizarCalendarioAdmin();
+return;
+}
+
+let el = document.getElementById("calendarAdmin");
+
+calendarAdmin = new FullCalendar.Calendar(el,{
+
+initialView:'dayGridMonth',
+locale:'pt-br',
+editable:true,
+height:'auto',
+
+headerToolbar:{
+left:'prev,next today',
+center:'title',
+right:'dayGridMonth,timeGridWeek'
+},
+
+eventDrop:function(info){
+
+let id = info.event.id;
+let novaData = info.event.startStr.slice(0,10);
+
+db.collection("escalas").doc(id).update({
+data:novaData
+}).then(()=>{
+listarEscalas();
+});
+
+}
+
+});
+
+calendarAdmin.render();
+
+atualizarCalendarioAdmin();
+
+}
+
+function atualizarCalendarioAdmin(){
+
+if(!calendarAdmin) return;
+
+calendarAdmin.removeAllEvents();
+
+db.collection("escalas").get().then(snapshot=>{
+
+snapshot.forEach(doc=>{
+
+let e = doc.data();
+
+calendarAdmin.addEvent({
+id:doc.id,
+title:e.hora + " - " + e.ministros.join(", "),
+start:e.data
+});
+
+});
+
+});
+
+}
+
+/* =========================
+INICIAR
+========================= */
 window.onload = function(){
 abrirTela("dashboard");
 };
