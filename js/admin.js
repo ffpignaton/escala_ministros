@@ -367,7 +367,24 @@ start:e.data
 
 function gerarPDF(){
 
-alert("PDF funcionando com sucesso!");
+function gerarPDF(){
+
+const { jsPDF } = window.jspdf;
+
+const doc = new jsPDF();
+
+doc.setFontSize(18);
+doc.text("Paróquia Santíssima Trindade", 20, 20);
+
+doc.setFontSize(14);
+doc.text("Escala dos Ministros", 20, 35);
+
+doc.setFontSize(12);
+doc.text("Documento gerado pelo sistema.", 20, 50);
+
+doc.save("escala-ministros.pdf");
+
+}
 
 }
 
