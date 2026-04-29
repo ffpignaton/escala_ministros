@@ -17,12 +17,25 @@
 
 <!-- MENU -->
 <div class="sidebar">
+
 <h2>⛪ Escalas</h2>
 
-<div class="menu-item">📋 Dashboard</div>
-<div class="menu-item">👥 Ministros</div>
-<div class="menu-item">📅 Escalas</div>
-<div class="menu-item">📄 Relatórios</div>
+<div class="menu-item" onclick="abrirTela('dashboard')">
+📋 Dashboard
+</div>
+
+<div class="menu-item" onclick="abrirTela('ministros')">
+👥 Ministros
+</div>
+
+<div class="menu-item" onclick="abrirTela('escalas')">
+📅 Escalas
+</div>
+
+<div class="menu-item" onclick="abrirTela('relatorios')">
+📄 Relatórios
+</div>
+
 </div>
 
 <!-- CONTEÚDO -->
@@ -33,39 +46,52 @@
 <h3>Painel Administrativo</h3>
 </header>
 
-<div class="grid">
+<!-- DASHBOARD -->
+<section id="dashboard" class="tela">
 
-<!-- CARD MINISTROS -->
 <div class="card">
-<h3>👥 Cadastro de Ministros</h3>
+<h3>Bem-vindo</h3>
+<p>Use o menu lateral para administrar ministros e escalas.</p>
+</div>
 
-<input id="nome" placeholder="Nome do ministro">
+</section>
+
+<!-- MINISTROS -->
+<section id="ministros" class="tela hidden">
+
+<div class="card">
+<h3>👥 Cadastro de Ministro</h3>
+
+<input id="nome" placeholder="Nome">
 <input id="fone" placeholder="Telefone">
 
 <button onclick="salvarMinistro()">Salvar Ministro</button>
-
-<div id="listaMinistros"></div>
-
 </div>
 
-<!-- CARD ESCALAS -->
+<div class="card">
+<h3>Lista de Ministros</h3>
+
+<div id="listaMinistros"></div>
+</div>
+
+</section>
+
+<!-- ESCALAS -->
+<section id="escalas" class="tela hidden">
+
 <div class="card">
 <h3>📅 Criar Escala</h3>
 
 <input type="date" id="dataEscala">
 <input type="time" id="horaEscala">
 
-<div class="checkbox-box" id="checkboxes"></div>
+<div id="seletorMinistros" class="tags-box"></div>
 
 <button onclick="salvarEscala()">Salvar Escala</button>
-
 </div>
 
-</div>
-
-<!-- TABELA -->
-<div class="card" style="margin-top:20px;">
-<h3>📋 Escalas Criadas</h3>
+<div class="card">
+<h3>Escalas Criadas</h3>
 
 <table class="table">
 <thead>
@@ -82,8 +108,19 @@
 
 </div>
 
+</section>
+
+<!-- RELATORIOS -->
+<section id="relatorios" class="tela hidden">
+
+<div class="card">
+<h3>📄 Relatórios</h3>
+<p>Área preparada para PDF e exportações.</p>
 </div>
 
+</section>
+
+</div>
 </div>
 
 <script src="script.js"></script>
