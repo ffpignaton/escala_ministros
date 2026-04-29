@@ -265,3 +265,27 @@ INICIAR
 window.onload = function(){
 abrirTela("dashboard");
 };
+
+function mascaraTelefone(campo){
+
+let v = campo.value.replace(/\D/g,'');
+
+if(v.length > 11){
+v = v.slice(0,11);
+}
+
+if(v.length > 0){
+v = "(" + v;
+}
+
+if(v.length > 3){
+v = v.slice(0,3) + ")" + v.slice(3);
+}
+
+if(v.length > 9){
+v = v.slice(0,9) + "-" + v.slice(9);
+}
+
+campo.value = v;
+
+}
