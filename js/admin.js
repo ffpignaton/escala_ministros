@@ -267,6 +267,48 @@ let novaData = prompt("Nova data:", dataAtual);
 if(novaData===null) return;
 
 let novaHora = prompt("Nova hora:", horaAtual);
+if(novaHora===null) return;
+
+/* BUSCAR MINISTROS */
+db.collection("ministros").get().then(snapshot=>{
+
+let nomes = [];
+
+snapshot.forEach(doc=>{
+nomes.push(doc.data().nome);
+});
+
+/* PERGUNTA NOVOS MINISTROS */
+let escolha = prompt(
+"Digite os ministros separados por vírgula:\n\nDisponíveis:\n" + nomes.join(", ")
+);
+
+if(!escolha) return;
+
+let novosMinistros = escolha.split(",").map(n=>n.trim());
+
+/* ATUALIZA */
+db.collection("escalas").doc(id).update({
+data:novaData,
+hora:novaHora,
+ministros:novosMinistros
+}).then(()=>{
+
+listarEscalas();
+atualizarCalendarioAdmin();
+
+alert("Escala atualizada!");
+
+});
+
+});
+
+}
+
+let novaData = prompt("Nova data:", dataAtual);
+if(novaData===null) return;
+
+let novaHora = prompt("Nova hora:", horaAtual);
 
 db.collection("escalas").doc(id).update({
 data:novaData,
