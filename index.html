@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Escalas</title>
+<title>Escala dos Ministros</title>
+
 <link rel="stylesheet" href="style.css">
 
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -17,17 +18,27 @@
 <h2>Matriz São Jorge</h2>
 </header>
 
-<section>
+<section class="calendar-box">
 
-<div class="cal-header">
-<button onclick="mesAnterior()">◀</button>
+<div class="calendar-top">
+<button onclick="mesAnterior()" class="nav-btn">◀</button>
 <h2 id="mesAno"></h2>
-<button onclick="proximoMes()">▶</button>
+<button onclick="proximoMes()" class="nav-btn">▶</button>
 </div>
 
-<div id="calendario"></div>
+<div class="weekdays">
+<div>Dom</div>
+<div>Seg</div>
+<div>Ter</div>
+<div>Qua</div>
+<div>Qui</div>
+<div>Sex</div>
+<div>Sáb</div>
+</div>
 
-<div id="detalhesDia"></div>
+<div id="calendario" class="calendar-grid"></div>
+
+<div id="detalhesDia" class="agenda-dia"></div>
 
 </section>
 
