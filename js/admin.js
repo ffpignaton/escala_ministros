@@ -10,6 +10,31 @@ document.querySelectorAll(".tela").forEach(t=>{
 t.classList.add("hidden");
 });
 
+let tela = document.getElementById(id);
+
+if(!tela){
+alert("Tela não encontrada: " + id);
+return;
+}
+
+tela.classList.remove("hidden");
+
+if(id==="ministros"){
+carregarMinistros();
+}
+
+if(id==="escalas"){
+carregarSeletorMinistros();
+listarEscalas();
+iniciarCalendarioAdmin();
+}
+
+}
+
+document.querySelectorAll(".tela").forEach(t=>{
+t.classList.add("hidden");
+});
+
 document.getElementById(id).classList.remove("hidden");
 
 if(id==="ministros"){
