@@ -478,3 +478,27 @@ INICIAR
 window.onload = function(){
 abrirTela("dashboard");
 };
+
+window.abrirTela = function(id){
+
+document.querySelectorAll(".tela").forEach(t=>{
+t.classList.add("hidden");
+});
+
+const tela = document.getElementById(id);
+
+if(!tela){
+console.log("Tela não encontrada:", id);
+return;
+}
+
+tela.classList.remove("hidden");
+
+if(id==="ministros") carregarMinistros();
+if(id==="escalas"){
+carregarSeletorMinistros();
+listarEscalas();
+iniciarCalendarioAdmin();
+}
+
+}
