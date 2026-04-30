@@ -160,3 +160,74 @@ overflow:auto;
 white-space:nowrap;
 }
 }
+
+/* =========================
+FULLCALENDAR CUSTOM
+========================= */
+
+/* Barra de botões */
+.fc .fc-toolbar {
+margin-bottom: 15px;
+}
+
+/* Botões gerais */
+.fc .fc-button {
+background: #0d47a1;
+border: none;
+border-radius: 10px;
+padding: 8px 14px;
+font-weight: bold;
+text-transform: capitalize;
+transition: 0.2s;
+}
+
+/* Hover */
+.fc .fc-button:hover {
+background: #1565c0;
+}
+
+/* Botão ativo (Mês/Semana selecionado) */
+.fc .fc-button-primary:not(:disabled).fc-button-active {
+background: #0b2d66;
+}
+
+/* Botão Hoje (destacado) */
+.fc .fc-today-button {
+background: #546e7a;
+}
+
+/* Setas (prev/next) */
+.fc .fc-prev-button,
+.fc .fc-next-button {
+font-size: 18px;
+padding: 6px 10px;
+border-radius: 8px;
+}
+
+/* Espaçamento entre botões */
+.fc .fc-toolbar-chunk {
+display: flex;
+gap: 8px;
+align-items: center;
+}
+
+/* Título do mês */
+.fc .fc-toolbar-title {
+font-size: 20px;
+font-weight: bold;
+color: #0d47a1;
+}
+
+/* Dia de hoje destacado */
+.fc .fc-day-today {
+background: #e3f2fd !important;
+}
+
+/* Eventos */
+.fc-event {
+background: #0d47a1;
+border: none;
+border-radius: 6px;
+padding: 2px 4px;
+font-size: 12px;
+}
