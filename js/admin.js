@@ -4,7 +4,7 @@ let ministrosSelecionados = [];
 let calendarAdmin = null;
 
 /* =========================
-FORMATAÇÃO DE DATA (BONITA)
+FORMATA DATA BONITA
 ========================= */
 function formatarDataCompleta(dataISO){
 
@@ -314,7 +314,7 @@ atualizarCalendarioAdmin();
 }
 
 /* =========================
-CALENDÁRIO
+CALENDÁRIO ADMIN
 ========================= */
 function iniciarCalendarioAdmin(){
 
@@ -327,18 +327,28 @@ return;
 let el = document.getElementById("calendarAdmin");
 
 calendarAdmin = new FullCalendar.Calendar(el,{
+
 initialView:'dayGridMonth',
 locale:'pt-br',
 editable:true,
 height:'auto',
+
 headerToolbar:{
 left:'prev,next today',
 center:'title',
 right:'dayGridMonth,timeGridWeek'
+},
+
+buttonText:{
+today:'Hoje',
+month:'Mês',
+week:'Semana'
 }
+
 });
 
 calendarAdmin.render();
+
 atualizarCalendarioAdmin();
 
 }
