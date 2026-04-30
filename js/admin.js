@@ -1,18 +1,23 @@
-alert("BEM VINDO");
+alert("ADMIN JS ESTÁ RODANDO");
 
 let ministrosSelecionados = [];
 let calendarAdmin = null;
 
 /* =========================
-FORMATAÇÃO DE DATA
+FORMATAÇÃO DE DATA (BONITA)
 ========================= */
-function formatarData(data){
+function formatarDataCompleta(dataISO){
 
-if(!data) return "";
+if(!dataISO) return "";
 
-const [ano, mes, dia] = data.split("-");
+const data = new Date(dataISO + "T00:00:00");
 
-return `${dia}-${mes}-${ano}`;
+return data.toLocaleDateString("pt-BR", {
+weekday: "long",
+day: "2-digit",
+month: "long",
+year: "numeric"
+});
 
 }
 
@@ -234,7 +239,7 @@ let e = doc.data();
 
 tabela.innerHTML += `
 <tr>
-<td>${formatarData(e.data)}</td>
+<td>${formatarDataCompleta(e.data)}</td>
 <td>${e.hora}</td>
 <td>${e.ministros.join(", ")}</td>
 <td>
@@ -384,7 +389,12 @@ snapshot.forEach(item=>{
 
 let e = item.data();
 
-doc.text(`${formatarData(e.data)} - ${e.hora} - ${e.ministros.join(", ")}`,20,y);
+doc.text(
+`${formatarDataCompleta(e.data)} - ${e.hora} - ${e.ministros.join(", ")}`,
+20,
+y
+);
+
 y+=8;
 
 if(y>270){
