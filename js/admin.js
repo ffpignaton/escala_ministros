@@ -1,5 +1,20 @@
+alert("BEM VINDO");
+
 let ministrosSelecionados = [];
 let calendarAdmin = null;
+
+/* =========================
+FORMATAÇÃO DE DATA
+========================= */
+function formatarData(data){
+
+if(!data) return "";
+
+const [ano, mes, dia] = data.split("-");
+
+return `${dia}-${mes}-${ano}`;
+
+}
 
 /* =========================
 TELAS
@@ -57,7 +72,7 @@ function salvarMinistro(){
 let nome = document.getElementById("nome").value.trim();
 let fone = document.getElementById("fone").value.trim();
 
-if(nome===""){
+if(!nome){
 alert("Digite o nome.");
 return;
 }
@@ -115,7 +130,7 @@ Excluir
 function editarMinistro(id,nomeAtual,foneAtual){
 
 let novoNome = prompt("Nome:", nomeAtual);
-if(novoNome===null) return;
+if(!novoNome) return;
 
 let novoFone = prompt("Telefone:", foneAtual);
 
@@ -219,7 +234,7 @@ let e = doc.data();
 
 tabela.innerHTML += `
 <tr>
-<td>${e.data}</td>
+<td>${formatarData(e.data)}</td>
 <td>${e.hora}</td>
 <td>${e.ministros.join(", ")}</td>
 <td>
@@ -320,6 +335,7 @@ right:'dayGridMonth,timeGridWeek'
 
 calendarAdmin.render();
 atualizarCalendarioAdmin();
+
 }
 
 function atualizarCalendarioAdmin(){
@@ -368,7 +384,7 @@ snapshot.forEach(item=>{
 
 let e = item.data();
 
-doc.text(`${e.data} - ${e.hora} - ${e.ministros.join(", ")}`,20,y);
+doc.text(`${formatarData(e.data)} - ${e.hora} - ${e.ministros.join(", ")}`,20,y);
 y+=8;
 
 if(y>270){
@@ -385,7 +401,7 @@ doc.save("escala.pdf");
 }
 
 /* =========================
-INIT
+INICIO
 ========================= */
 window.onload = function(){
 abrirTela("dashboard");
