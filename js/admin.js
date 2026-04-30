@@ -1,5 +1,3 @@
-alert("ADMIN JS ESTÁ RODANDO");
-
 let ministrosSelecionados = [];
 let calendarAdmin = null;
 
