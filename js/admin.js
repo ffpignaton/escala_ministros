@@ -305,19 +305,6 @@ alert("Escala atualizada!");
 
 }
 
-let novaData = prompt("Nova data:", dataAtual);
-if(novaData===null) return;
-
-let novaHora = prompt("Nova hora:", horaAtual);
-
-db.collection("escalas").doc(id).update({
-data:novaData,
-hora:novaHora
-}).then(()=>{
-listarEscalas();
-atualizarCalendarioAdmin();
-});
-
 }
 
 function deletarEscala(id){
