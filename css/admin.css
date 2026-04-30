@@ -231,3 +231,8 @@ border-radius: 6px;
 padding: 2px 4px;
 font-size: 12px;
 }
+
+/* Deixa o título com primeira letra maiúscula */
+.fc-toolbar-title {
+text-transform: capitalize;
+}
