@@ -271,7 +271,7 @@ window.gerarPDF = function() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
 
-        let y = 40;
+        let y = 25;
 
         /* Carregar logo */
         let img = new Image();
