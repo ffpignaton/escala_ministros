@@ -1,10 +1,12 @@
-alert("ADMIN FUNCIONANDO");
+alert("ADMIN OK");
 
-/* ABRIR TELA */
+/* ===========================
+ABRIR TELAS
+=========================== */
 window.abrirTela = function(id){
 
-document.querySelectorAll(".tela").forEach(t=>{
-t.classList.add("hidden");
+document.querySelectorAll(".tela").forEach(sec=>{
+sec.classList.add("hidden");
 });
 
 const tela = document.getElementById(id);
@@ -13,57 +15,51 @@ if(tela){
 tela.classList.remove("hidden");
 }
 
-/* carregar conteúdos */
+/* carregar extras */
 if(id==="ministros"){
-carregarMinistros();
+document.getElementById("listaMinistros").innerHTML =
+"<div class='card'>Tela Ministros funcionando</div>";
 }
 
 if(id==="escalas"){
-carregarMinistrosEscala();
+document.getElementById("listaEscalasCards").innerHTML =
+"<div class='card'>Tela Escalas funcionando</div>";
 }
 
 };
 
-/* INICIO */
-window.onload = function(){
-abrirTela("dashboard");
-};
-
-/* ===================
-MINISTROS
-=================== */
-function carregarMinistros(){
-
-document.getElementById("listaMinistros").innerHTML = `
-<div class="card">
-Cadastro de ministros funcionando.
-</div>
-`;
-
-}
-
-/* ===================
-ESCALAS
-=================== */
-function carregarMinistrosEscala(){
-
-document.getElementById("listaEscalasCards").innerHTML = `
-<div class="card">
-Tela escalas funcionando.
-</div>
-`;
-
-}
-
-/* BOTÕES */
+/* ===========================
+BOTÕES
+=========================== */
 window.salvarMinistro = function(){
-alert("Salvar ministro OK");
+alert("Salvar Ministro");
 };
 
 window.salvarEscala = function(){
-alert("Salvar escala OK");
+alert("Salvar Escala");
 };
 
 window.gerarPDF = function(){
-alert("PDF OK");
+alert("PDF funcionando");
+};
+
+window.salvarEdicao = function(){
+alert("Salvar edição");
+};
+
+window.fecharModal = function(){
+document.getElementById("modalEditar").style.display="none";
+};
+
+window.toggleMinistro = function(el){
+el.classList.toggle("active");
+};
+
+window.mascaraTelefone = function(){};
+
+/* ===========================
+INÍCIO
+=========================== */
+window.onload = function(){
+abrirTela("dashboard");
 };
