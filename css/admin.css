@@ -1,82 +1,301 @@
-body{
+*{
 margin:0;
-font-family:Arial,Helvetica,sans-serif;
-background:#eef2f7;
+padding:0;
+box-sizing:border-box;
 }
 
-/* ESSA LINHA RESOLVE */
+body{
+font-family:Arial,Helvetica,sans-serif;
+background:#eef2f7;
+color:#222;
+}
+
+/* ===================================
+OCULTAR TELAS
+=================================== */
 .hidden{
 display:none;
 }
 
+/* ===================================
+LAYOUT
+=================================== */
 .dashboard{
 display:flex;
 min-height:100vh;
 }
 
+/* ===================================
+MENU LATERAL
+=================================== */
 .sidebar{
-width:230px;
-background:#1f4fa3;
+width:260px;
+background:linear-gradient(180deg,#0d47a1,#1565c0);
 color:white;
-padding:20px;
+padding:25px;
+box-shadow:4px 0 15px rgba(0,0,0,0.08);
+}
+
+.sidebar h2{
+font-size:24px;
+margin-bottom:30px;
+text-align:center;
+font-weight:bold;
 }
 
 .menu-item{
-padding:12px;
-margin-bottom:10px;
-background:rgba(255,255,255,0.1);
-border-radius:8px;
+padding:14px 16px;
+margin-bottom:12px;
+border-radius:12px;
 cursor:pointer;
+font-size:16px;
+transition:0.3s;
+background:rgba(255,255,255,0.08);
 }
 
 .menu-item:hover{
-background:rgba(255,255,255,0.2);
+background:rgba(255,255,255,0.18);
+transform:translateX(5px);
 }
 
+/* ===================================
+CONTEÚDO
+=================================== */
 .main{
 flex:1;
-padding:25px;
+padding:30px;
 }
 
-.card{
+/* ===================================
+TOPO
+=================================== */
+.topo{
 background:white;
 padding:20px;
-border-radius:12px;
-margin-bottom:20px;
-box-shadow:0 2px 8px rgba(0,0,0,0.08);
+border-radius:18px;
+margin-bottom:25px;
+box-shadow:0 4px 12px rgba(0,0,0,0.06);
 }
 
-input{
+.topo h1{
+font-size:28px;
+color:#0d47a1;
+margin-bottom:5px;
+}
+
+.topo p{
+color:#666;
+}
+
+/* ===================================
+CARDS
+=================================== */
+.card{
+background:white;
+padding:22px;
+border-radius:18px;
+margin-bottom:22px;
+box-shadow:0 6px 18px rgba(0,0,0,0.06);
+transition:0.3s;
+}
+
+.card:hover{
+transform:translateY(-3px);
+box-shadow:0 10px 22px rgba(0,0,0,0.08);
+}
+
+.card h2,
+.card h3{
+margin-bottom:15px;
+color:#0d47a1;
+}
+
+/* ===================================
+INPUTS
+=================================== */
+input,
+select{
 width:100%;
-padding:10px;
-margin-bottom:10px;
-border:1px solid #ccc;
-border-radius:8px;
+padding:12px;
+border:1px solid #dcdcdc;
+border-radius:12px;
+margin-bottom:12px;
+font-size:15px;
+outline:none;
+transition:0.2s;
 }
 
+input:focus{
+border-color:#1565c0;
+box-shadow:0 0 0 3px rgba(21,101,192,0.12);
+}
+
+/* ===================================
+BOTÕES
+=================================== */
 button{
-background:#1f4fa3;
+background:linear-gradient(90deg,#1565c0,#1976d2);
 color:white;
 border:none;
-padding:10px 15px;
-border-radius:8px;
+padding:11px 18px;
+border-radius:12px;
 cursor:pointer;
+font-size:14px;
+font-weight:bold;
+transition:0.3s;
+margin-right:5px;
 }
 
+button:hover{
+transform:translateY(-2px);
+opacity:0.95;
+}
+
+.btn-delete{
+background:linear-gradient(90deg,#d32f2f,#f44336);
+}
+
+.btn-save{
+background:linear-gradient(90deg,#2e7d32,#43a047);
+}
+
+.btn-cancel{
+background:#999;
+}
+
+/* ===================================
+TAGS MINISTROS
+=================================== */
 .tags-box{
 display:flex;
 flex-wrap:wrap;
-gap:8px;
+gap:10px;
+margin-top:10px;
 }
 
 .tag{
-padding:6px 10px;
-background:#ddd;
-border-radius:20px;
+padding:8px 14px;
+background:#e3eaf5;
+border-radius:30px;
 cursor:pointer;
+font-size:14px;
+transition:0.2s;
+}
+
+.tag:hover{
+transform:scale(1.05);
 }
 
 .tag.active{
-background:#1f4fa3;
+background:#1565c0;
 color:white;
+}
+
+/* ===================================
+LISTA ESCALAS
+=================================== */
+.escala-card{
+background:#fff;
+padding:18px;
+border-radius:16px;
+margin-bottom:15px;
+box-shadow:0 4px 10px rgba(0,0,0,0.05);
+}
+
+.escala-header{
+display:flex;
+justify-content:space-between;
+margin-bottom:12px;
+font-weight:bold;
+color:#0d47a1;
+}
+
+.escala-ministros{
+display:flex;
+flex-wrap:wrap;
+gap:8px;
+margin-bottom:12px;
+}
+
+.escala-actions{
+display:flex;
+gap:8px;
+justify-content:flex-end;
+}
+
+/* ===================================
+CALENDÁRIO
+=================================== */
+#calendarAdmin{
+background:white;
+padding:15px;
+border-radius:18px;
+box-shadow:0 6px 18px rgba(0,0,0,0.06);
+}
+
+/* ===================================
+MODAL
+=================================== */
+.modal-box{
+background:white;
+padding:25px;
+border-radius:18px;
+width:400px;
+max-width:95%;
+box-shadow:0 8px 24px rgba(0,0,0,0.15);
+animation:subir 0.25s ease;
+}
+
+.modal-actions{
+display:flex;
+justify-content:flex-end;
+gap:10px;
+margin-top:15px;
+}
+
+@keyframes subir{
+from{
+opacity:0;
+transform:translateY(25px);
+}
+to{
+opacity:1;
+transform:translateY(0);
+}
+}
+
+/* ===================================
+RESPONSIVO
+=================================== */
+@media(max-width:900px){
+
+.dashboard{
+flex-direction:column;
+}
+
+.sidebar{
+width:100%;
+display:flex;
+overflow:auto;
+gap:10px;
+padding:15px;
+}
+
+.sidebar h2{
+display:none;
+}
+
+.menu-item{
+white-space:nowrap;
+margin-bottom:0;
+}
+
+.main{
+padding:15px;
+}
+
+.topo h1{
+font-size:22px;
+}
+
 }
