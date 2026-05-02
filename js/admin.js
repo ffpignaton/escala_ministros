@@ -280,7 +280,7 @@ window.gerarPDF = function() {
         img.onload = function() {
             doc.addImage(img, "PNG", 10, 10, 18, 18);
             doc.setFontSize(18);
-            doc.text("Paróquia Santíssima Trindade", 35, 20); // Alinha título à direita do logo
+            doc.text("Paróquia Santíssima Trindade", 30, 18); // Alinha título à direita do logo
             y = 35;
 
             let agrupado = {};
