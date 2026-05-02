@@ -1,9 +1,11 @@
-alert("ADMIN JS MASTER PDF + LOGO");
+alert("ADMIN JS MASTER FINAL");
 
 /* =========================================
 VARIÁVEIS GLOBAIS
 ========================================= */
 let ministrosSelecionados = [];
+let ministrosEdicao = [];
+let escalaEditandoId = null;
 let calendarAdmin = null;
 
 /* =========================================
@@ -27,42 +29,33 @@ listarEscalas();
 iniciarCalendario();
 }
 
-};
-
-/* =========================================
-TELEFONE
-========================================= */
-window.mascaraTelefone = function(campo){
-
-let v = campo.value.replace(/\D/g,'');
-
-if(v.length > 11) v = v.slice(0,11);
-
-if(v.length > 0) v = "(" + v;
-if(v.length > 3) v = v.slice(0,3)+")"+v.slice(3);
-if(v.length > 9) v = v.slice(0,9)+"-"+v.slice(9);
-
-campo.value = v;
-
-};
-
 /* =========================================
 MINISTROS
 ========================================= */
+};
+
 window.salvarMinistro = function(){
 
 let nome = document.getElementById("nome").value.trim();
 let fone = document.getElementById("fone").value.trim();
 
-if(!nome) return alert("Digite o nome.");
+if(!nome){
+alert("Digite o nome.");
+return;
+}
 
 db.collection("ministros").add({
 nome:nome,
 fone:fone
 }).then(()=>{
+
 document.getElementById("nome").value="";
 document.getElementById("fone").value="";
+
 carregarMinistros();
+
+alert("Ministro salvo!");
+
 });
 
 };
@@ -70,7 +63,7 @@ carregarMinistros();
 function carregarMinistros(){
 
 let lista = document.getElementById("listaMinistros");
-lista.innerHTML="";
+lista.innerHTML = "";
 
 db.collection("ministros").get().then(snapshot=>{
 
@@ -109,17 +102,19 @@ Excluir
 
 }
 
-window.editarMinistro = function(id,n,f){
+window.editarMinistro = function(id,nomeAtual,foneAtual){
 
-let nome = prompt("Nome:",n);
-if(!nome) return;
+let novoNome = prompt("Nome:", nomeAtual);
+if(!novoNome) return;
 
-let fone = prompt("Telefone:",f);
+let novoFone = prompt("Telefone:", foneAtual);
 
 db.collection("ministros").doc(id).update({
-nome:nome,
-fone:fone
-}).then(carregarMinistros);
+nome:novoNome,
+fone:novoFone
+}).then(()=>{
+carregarMinistros();
+});
 
 };
 
@@ -183,15 +178,27 @@ window.salvarEscala = function(){
 let data = document.getElementById("dataEscala").value;
 let hora = document.getElementById("horaEscala").value;
 
-if(!data || !hora) return alert("Preencha data e hora.");
+if(!data || !hora){
+alert("Preencha data e hora.");
+return;
+}
+
+if(ministrosSelecionados.length===0){
+alert("Selecione ministros.");
+return;
+}
 
 db.collection("escalas").add({
 data:data,
 hora:hora,
 ministros:ministrosSelecionados
 }).then(()=>{
+
 listarEscalas();
 atualizarCalendario();
+
+alert("Escala salva!");
+
 });
 
 };
@@ -219,12 +226,18 @@ lista.innerHTML += `
 
 <div class="botoes-linha">
 
+<button class="btn-edit"
+onclick="editarEscala('${doc.id}','${e.data}','${e.hora}')">
+Editar
+</button>
+
 <button class="btn-delete"
 onclick="deletarEscala('${doc.id}')">
 Excluir
 </button>
 
 </div>
+
 </div>
 
 <div style="margin-top:10px;color:#555">
@@ -356,7 +369,6 @@ let y = 20;
 
 /* carregar logo */
 let img = new Image();
-
 img.src = "logo.png";
 
 img.onload = function(){
@@ -366,34 +378,39 @@ doc.addImage(img,"PNG",15,10,25,25);
 doc.setFontSize(18);
 doc.text("Paróquia Santíssima Trindade",50,20);
 
-doc.setFontSize(12);
-doc.text("Relatório de Escalas",50,28);
-
 y = 45;
 
 snapshot.forEach(item=>{
 
 let e = item.data();
+let date = new Date(e.data + "T00:00:00");
+let dayOfWeek = date.toLocaleString("pt-BR", { weekday: "long" });
+let day = date.getDate();
+let month = date.toLocaleString("pt-BR", { month: "long" });
+let year = date.getFullYear();
 
-doc.setFontSize(11);
+let formattedDate = `${dayOfWeek}, ${day} de ${month} de ${year}`;
 
-doc.text(
-formatarDataCompleta(e.data) +
-" - " + e.hora,
-15,
-y
-);
+doc.setFontSize(12);
+doc.text(formattedDate, 15, y);
+y += 10;
 
+e.ministros.forEach((ministro, index) => {
+
+let hourText = `Hora: ${e.hora}`;
+let ministroText = `Ministros: ${ministro}`;
+
+doc.text(hourText, 15, y);
 y += 6;
 
-doc.text(
-"Ministros: " +
-e.ministros.join(", "),
-15,
-y
-);
-
+doc.text(ministroText, 15, y);
 y += 10;
+
+if(index < e.ministros.length - 1){
+y += 4; // adicionar espaçamento entre ministros
+}
+
+});
 
 if(y > 270){
 doc.addPage();
