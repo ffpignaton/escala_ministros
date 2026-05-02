@@ -1,15 +1,15 @@
-/* ===============================
+document.addEventListener("DOMContentLoaded", function(){
+
+/* ===================================
 VARIÁVEIS
-=============================== */
+=================================== */
 let ministrosSelecionados = [];
-let ministrosEdicao = [];
-let escalaEditandoId = null;
 let calendarAdmin = null;
 
-/* ===============================
-ABRIR TELAS
-=============================== */
-function abrirTela(id){
+/* ===================================
+FUNÇÃO ABRIR TELA
+=================================== */
+window.abrirTela = function(id){
 
 document.querySelectorAll(".tela").forEach(sec=>{
 sec.style.display = "none";
@@ -32,21 +32,18 @@ listarEscalas();
 iniciarCalendarioAdmin();
 }
 
-}
+};
 
-/* DEIXAR GLOBAL */
-window.abrirTela = abrirTela;
-
-/* ===============================
-MINISTROS
-=============================== */
-function salvarMinistro(){
+/* ===================================
+SALVAR MINISTRO
+=================================== */
+window.salvarMinistro = function(){
 
 let nome = document.getElementById("nome").value.trim();
 let fone = document.getElementById("fone").value.trim();
 
 if(!nome){
-alert("Digite nome");
+alert("Digite o nome");
 return;
 }
 
@@ -54,19 +51,25 @@ db.collection("ministros").add({
 nome:nome,
 fone:fone
 }).then(()=>{
+
 document.getElementById("nome").value="";
 document.getElementById("fone").value="";
+
 carregarMinistros();
+
 });
 
-}
+};
 
-window.salvarMinistro = salvarMinistro;
-
+/* ===================================
+CARREGAR MINISTROS
+=================================== */
 function carregarMinistros(){
 
 const lista = document.getElementById("listaMinistros");
-lista.innerHTML="";
+if(!lista) return;
+
+lista.innerHTML = "";
 
 db.collection("ministros").get().then(snapshot=>{
 
@@ -87,14 +90,16 @@ ${m.fone || ""}
 
 }
 
-/* ===============================
-ESCALAS
-=============================== */
+/* ===================================
+SELETOR MINISTROS
+=================================== */
 function carregarSeletorMinistros(){
 
 const box = document.getElementById("seletorMinistros");
-box.innerHTML="";
-ministrosSelecionados=[];
+if(!box) return;
+
+box.innerHTML = "";
+ministrosSelecionados = [];
 
 db.collection("ministros").get().then(snapshot=>{
 
@@ -115,22 +120,28 @@ ${nome}
 
 }
 
-function toggleMinistro(el,nome){
+window.toggleMinistro = function(el,nome){
 
 if(ministrosSelecionados.includes(nome)){
+
 ministrosSelecionados =
 ministrosSelecionados.filter(x=>x!==nome);
+
 el.classList.remove("active");
+
 }else{
+
 ministrosSelecionados.push(nome);
 el.classList.add("active");
-}
 
 }
 
-window.toggleMinistro = toggleMinistro;
+};
 
-function salvarEscala(){
+/* ===================================
+SALVAR ESCALA
+=================================== */
+window.salvarEscala = function(){
 
 let data = document.getElementById("dataEscala").value;
 let hora = document.getElementById("horaEscala").value;
@@ -148,14 +159,17 @@ ministros:ministrosSelecionados
 listarEscalas();
 });
 
-}
+};
 
-window.salvarEscala = salvarEscala;
-
+/* ===================================
+LISTAR ESCALAS
+=================================== */
 function listarEscalas(){
 
 const lista = document.getElementById("listaEscalasCards");
-lista.innerHTML="";
+if(!lista) return;
+
+lista.innerHTML = "";
 
 db.collection("escalas").get().then(snapshot=>{
 
@@ -176,15 +190,14 @@ ${e.ministros.join(", ")}
 
 }
 
-/* ===============================
+/* ===================================
 CALENDÁRIO
-=============================== */
+=================================== */
 function iniciarCalendarioAdmin(){
 
 if(calendarAdmin) return;
 
-let el = document.getElementById("calendarAdmin");
-
+const el = document.getElementById("calendarAdmin");
 if(!el) return;
 
 calendarAdmin = new FullCalendar.Calendar(el,{
@@ -196,18 +209,16 @@ calendarAdmin.render();
 
 }
 
-/* ===============================
+/* ===================================
 PDF
-=============================== */
-function gerarPDF(){
-alert("PDF OK");
-}
-
-window.gerarPDF = gerarPDF;
-
-/* ===============================
-INÍCIO
-=============================== */
-window.onload = function(){
-abrirTela("dashboard");
+=================================== */
+window.gerarPDF = function(){
+alert("PDF funcionando");
 };
+
+/* ===================================
+ABRIR INICIAL
+=================================== */
+abrirTela("dashboard");
+
+});
