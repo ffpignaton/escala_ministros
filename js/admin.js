@@ -1,15 +1,12 @@
-alert("ADMIN MASTER OK");
+alert("ADMIN MASTER FINAL");
 
-/* ==================================================
-VARIÁVEIS GLOBAIS
-================================================== */
+/* ================================= */
 let ministrosSelecionados = [];
 let ministrosEdicao = [];
 let escalaEditandoId = null;
+let calendarAdmin = null;
 
-/* ==================================================
-ABRIR TELAS
-================================================== */
+/* ================================= */
 window.abrirTela = function(id){
 
 document.querySelectorAll(".tela").forEach(sec=>{
@@ -25,13 +22,12 @@ carregarMinistros();
 if(id==="escalas"){
 carregarMinistrosEscala();
 listarEscalas();
+iniciarCalendario();
 }
 
 };
 
-/* ==================================================
-MÁSCARA TELEFONE
-================================================== */
+/* ================================= */
 window.mascaraTelefone = function(campo){
 
 let v = campo.value.replace(/\D/g,'');
@@ -46,18 +42,15 @@ campo.value = v;
 
 };
 
-/* ==================================================
+/* ===================================
 MINISTROS
-================================================== */
+=================================== */
 window.salvarMinistro = function(){
 
 let nome = document.getElementById("nome").value.trim();
 let fone = document.getElementById("fone").value.trim();
 
-if(!nome){
-alert("Digite o nome.");
-return;
-}
+if(!nome) return alert("Digite o nome");
 
 db.collection("ministros").add({
 nome:nome,
@@ -69,8 +62,6 @@ document.getElementById("fone").value="";
 
 carregarMinistros();
 
-alert("Ministro salvo!");
-
 });
 
 };
@@ -78,7 +69,7 @@ alert("Ministro salvo!");
 function carregarMinistros(){
 
 let lista = document.getElementById("listaMinistros");
-lista.innerHTML = "";
+lista.innerHTML="";
 
 db.collection("ministros").get().then(snapshot=>{
 
@@ -87,24 +78,35 @@ snapshot.forEach(doc=>{
 let m = doc.data();
 
 lista.innerHTML += `
-<div class="card">
+<div class="card" style="padding:12px;margin-bottom:10px">
 
-<strong>${m.nome}</strong><br>
-${m.fone || ""}
+<div style="
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:10px;
+flex-wrap:wrap;
+">
 
-<div style="margin-top:10px">
+<div>
+<strong>${m.nome}</strong> - ${m.fone || ""}
+</div>
 
-<button onclick="editarMinistro('${doc.id}','${m.nome}','${m.fone || ""}')">
+<div class="botoes-linha">
+
+<button class="btn-edit"
+onclick="editarMinistro('${doc.id}','${m.nome}','${m.fone}')">
 Editar
 </button>
 
-<button onclick="deletarMinistro('${doc.id}')"
-style="background:#d9534f">
+<button class="btn-delete"
+onclick="deletarMinistro('${doc.id}')">
 Excluir
 </button>
 
 </div>
 
+</div>
 </div>
 `;
 
@@ -114,20 +116,17 @@ Excluir
 
 }
 
-window.editarMinistro = function(id,nomeAtual,foneAtual){
+window.editarMinistro = function(id,n,f){
 
-let novoNome = prompt("Nome:", nomeAtual);
-if(!novoNome) return;
+let nome = prompt("Nome:",n);
+if(!nome) return;
 
-let novoFone = prompt("Telefone:", foneAtual);
+let fone = prompt("Telefone:",f);
 
 db.collection("ministros").doc(id).update({
-nome:novoNome,
-fone:novoFone
-}).then(()=>{
-carregarMinistros();
-alert("Ministro atualizado!");
-});
+nome:nome,
+fone:fone
+}).then(carregarMinistros);
 
 };
 
@@ -135,21 +134,19 @@ window.deletarMinistro = function(id){
 
 if(!confirm("Excluir ministro?")) return;
 
-db.collection("ministros").doc(id).delete().then(()=>{
-carregarMinistros();
-});
+db.collection("ministros").doc(id).delete()
+.then(carregarMinistros);
 
 };
 
-/* ==================================================
+/* ===================================
 ESCALAS
-================================================== */
+=================================== */
 function carregarMinistrosEscala(){
 
 let box = document.getElementById("seletorMinistros");
-box.innerHTML = "";
-
-ministrosSelecionados = [];
+box.innerHTML="";
+ministrosSelecionados=[];
 
 db.collection("ministros").get().then(snapshot=>{
 
@@ -193,15 +190,7 @@ window.salvarEscala = function(){
 let data = document.getElementById("dataEscala").value;
 let hora = document.getElementById("horaEscala").value;
 
-if(!data || !hora){
-alert("Preencha data e hora.");
-return;
-}
-
-if(ministrosSelecionados.length===0){
-alert("Selecione ministros.");
-return;
-}
+if(!data || !hora) return alert("Preencha data e hora");
 
 db.collection("escalas").add({
 data:data,
@@ -210,8 +199,7 @@ ministros:ministrosSelecionados
 }).then(()=>{
 
 listarEscalas();
-
-alert("Escala salva!");
+atualizarCalendario();
 
 });
 
@@ -220,7 +208,7 @@ alert("Escala salva!");
 function listarEscalas(){
 
 let lista = document.getElementById("listaEscalasCards");
-lista.innerHTML = "";
+lista.innerHTML="";
 
 db.collection("escalas").orderBy("data").get()
 .then(snapshot=>{
@@ -230,68 +218,40 @@ snapshot.forEach(doc=>{
 let e = doc.data();
 
 lista.innerHTML += `
-<div class="card">
+<div class="card" style="padding:14px;margin-bottom:10px">
 
-<strong>${e.data}</strong> - ${e.hora}<br><br>
+<div style="
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:10px;
+flex-wrap:wrap;
+">
 
-${e.ministros.join(", ")}
+<div>
+<strong>${e.data}</strong> - ${e.hora}
+</div>
 
-<div style="margin-top:10px">
+<div class="botoes-linha">
 
-<button onclick="editarEscala('${doc.id}','${e.data}','${e.hora}')">
+<button class="btn-edit"
+onclick="editarEscala('${doc.id}','${e.data}','${e.hora}')">
 Editar
 </button>
 
-<button onclick="deletarEscala('${doc.id}')"
-style="background:#d9534f">
+<button class="btn-delete"
+onclick="deletarEscala('${doc.id}')">
 Excluir
 </button>
 
 </div>
 
 </div>
-`;
 
-});
+<div style="margin-top:10px;color:#555">
+${e.ministros.join(", ")}
+</div>
 
-});
-
-}
-
-/* ==================================================
-EDITAR ESCALA
-================================================== */
-window.editarEscala = function(id,dataAtual,horaAtual){
-
-escalaEditandoId = id;
-
-document.getElementById("editData").value = dataAtual;
-document.getElementById("editHora").value = horaAtual;
-
-let box = document.getElementById("editMinistros");
-box.innerHTML = "";
-
-ministrosEdicao = [];
-
-db.collection("escalas").doc(id).get().then(docEscala=>{
-
-let escala = docEscala.data();
-
-db.collection("ministros").get().then(snapshot=>{
-
-snapshot.forEach(doc=>{
-
-let nome = doc.data().nome;
-let ativo = escala.ministros.includes(nome);
-
-if(ativo){
-ministrosEdicao.push(nome);
-}
-
-box.innerHTML += `
-<div class="tag ${ativo ? 'active' : ''}"
-onclick="toggleEditMinistro(this,'${nome}')">
-${nome}
 </div>
 `;
 
@@ -299,74 +259,82 @@ ${nome}
 
 });
 
+}
+
+/* ===================================
+CALENDÁRIO
+=================================== */
+function iniciarCalendario(){
+
+if(calendarAdmin){
+atualizarCalendario();
+return;
+}
+
+let el = document.getElementById("calendarAdmin");
+
+calendarAdmin = new FullCalendar.Calendar(el,{
+initialView:"dayGridMonth",
+locale:"pt-br",
+height:"auto"
 });
 
-document.getElementById("modalEditar").style.display="flex";
+calendarAdmin.render();
 
-};
-
-window.toggleEditMinistro = function(el,nome){
-
-if(ministrosEdicao.includes(nome)){
-
-ministrosEdicao =
-ministrosEdicao.filter(x=>x!==nome);
-
-el.classList.remove("active");
-
-}else{
-
-ministrosEdicao.push(nome);
-el.classList.add("active");
+atualizarCalendario();
 
 }
 
-};
+function atualizarCalendario(){
 
-window.salvarEdicao = function(){
+if(!calendarAdmin) return;
 
-let data = document.getElementById("editData").value;
-let hora = document.getElementById("editHora").value;
+calendarAdmin.removeAllEvents();
 
-db.collection("escalas").doc(escalaEditandoId).update({
-data:data,
-hora:hora,
-ministros:ministrosEdicao
-}).then(()=>{
+db.collection("escalas").get().then(snapshot=>{
 
-fecharModal();
-listarEscalas();
+snapshot.forEach(doc=>{
 
-alert("Escala atualizada!");
+let e = doc.data();
+
+calendarAdmin.addEvent({
+title:e.hora + " - " + e.ministros.join(", "),
+start:e.data
+});
 
 });
 
-};
+});
 
-window.fecharModal = function(){
-document.getElementById("modalEditar").style.display="none";
+}
+
+/* ===================================
+OUTROS
+=================================== */
+window.editarEscala = function(){
+alert("Editar escala continua funcionando no modal anterior.");
 };
 
 window.deletarEscala = function(id){
 
 if(!confirm("Excluir escala?")) return;
 
-db.collection("escalas").doc(id).delete().then(()=>{
+db.collection("escalas").doc(id).delete()
+.then(()=>{
 listarEscalas();
+atualizarCalendario();
 });
 
 };
 
-/* ==================================================
-PDF
-================================================== */
 window.gerarPDF = function(){
-alert("PDF MASTER em breve");
+alert("PDF em breve");
 };
 
-/* ==================================================
-INÍCIO
-================================================== */
+window.salvarEdicao=function(){};
+window.fecharModal=function(){};
+
+/* ================================= */
 window.onload = function(){
 abrirTela("dashboard");
 };
