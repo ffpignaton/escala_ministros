@@ -13,20 +13,27 @@ ABRIR TELAS
 ========================================= */
 window.abrirTela = function(id){
 
-    document.querySelectorAll(".tela").forEach(sec=>{
+    // Esconde todas as telas
+    document.querySelectorAll(".tela").forEach(sec => {
         sec.classList.add("hidden");
     });
 
+    // Exibe a tela específica
     document.getElementById(id).classList.remove("hidden");
 
-    if(id==="ministros"){
+    if(id === "ministros") {
         carregarMinistros();
     }
 
-    if(id==="escalas"){
+    if(id === "escalas") {
         carregarMinistrosEscala();
         listarEscalas();
         iniciarCalendario();
+    }
+
+    if(id === "relatorios") {
+        // Lógica do relatório
+    }
 };
 
 /* =========================================
@@ -43,78 +50,63 @@ window.salvarMinistro = function(){
     }
 
     db.collection("ministros").add({
-        nome:nome,
-        fone:fone
-    }).then(()=>{
+        nome: nome,
+        fone: fone
+    }).then(() => {
 
-        document.getElementById("nome").value="";
-        document.getElementById("fone").value="";
+        document.getElementById("nome").value = "";
+        document.getElementById("fone").value = "";
 
         carregarMinistros();
-
         alert("Ministro salvo!");
     });
-
 };
 
-function carregarMinistros(){
+function carregarMinistros() {
 
     let lista = document.getElementById("listaMinistros");
-    lista.innerHTML="";
+    lista.innerHTML = "";
 
-    db.collection("ministros").get().then(snapshot=>{
+    db.collection("ministros").get().then(snapshot => {
 
-        snapshot.forEach(doc=>{
-
+        snapshot.forEach(doc => {
             let m = doc.data();
 
             lista.innerHTML += `
             <div class="card" style="padding:12px;margin-bottom:10px">
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
-
-            <div>
-            <strong>${m.nome}</strong> - ${m.fone || ""}
-            </div>
-
-            <div class="botoes-linha">
-
-            <button class="btn-edit"
-            onclick="editarMinistro('${doc.id}','${m.nome}','${m.fone || ""}')">
-            Editar
-            </button>
-
-            <button class="btn-delete"
-            onclick="deletarMinistro('${doc.id}')">
-            Excluir
-            </button>
-
-            </div>
-            </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+                    <div>
+                        <strong>${m.nome}</strong> - ${m.fone || ""}
+                    </div>
+                    <div class="botoes-linha">
+                        <button class="btn-edit" onclick="editarMinistro('${doc.id}','${m.nome}','${m.fone || ""}')">Editar</button>
+                        <button class="btn-delete" onclick="deletarMinistro('${doc.id}')">Excluir</button>
+                    </div>
+                </div>
             </div>
             `;
         });
     });
 }
 
-window.editarMinistro = function(id,nomeAtual,foneAtual){
+window.editarMinistro = function(id, nomeAtual, foneAtual) {
 
     let novoNome = prompt("Nome:", nomeAtual);
-    if(!novoNome) return;
+    if (!novoNome) return;
 
     let novoFone = prompt("Telefone:", foneAtual);
 
     db.collection("ministros").doc(id).update({
-        nome:novoNome,
-        fone:novoFone
-    }).then(()=>{
+        nome: novoNome,
+        fone: novoFone
+    }).then(() => {
         carregarMinistros();
     });
-
 };
 
-window.deletarMinistro = function(id){
+window.deletarMinistro = function(id) {
 
-    if(!confirm("Excluir ministro?")) return;
+    if (!confirm("Excluir ministro?")) return;
 
     db.collection("ministros").doc(id).delete()
     .then(carregarMinistros);
@@ -123,128 +115,100 @@ window.deletarMinistro = function(id){
 /* =========================================
 ESCALAS
 ========================================= */
-function carregarMinistrosEscala(){
+function carregarMinistrosEscala() {
 
     let box = document.getElementById("seletorMinistros");
-    box.innerHTML="";
-    ministrosSelecionados=[];
+    box.innerHTML = "";
+    ministrosSelecionados = [];
 
-    db.collection("ministros").get().then(snapshot=>{
+    db.collection("ministros").get().then(snapshot => {
 
-        snapshot.forEach(doc=>{
+        snapshot.forEach(doc => {
 
             let nome = doc.data().nome;
 
             box.innerHTML += `
-            <div class="tag"
-            onclick="toggleMinistro(this,'${nome}')">
-            ${nome}
-            </div>
+            <div class="tag" onclick="toggleMinistro(this,'${nome}')">${nome}</div>
             `;
         });
-
     });
 }
 
-window.toggleMinistro = function(el,nome){
+window.toggleMinistro = function(el, nome) {
 
-    if(ministrosSelecionados.includes(nome)){
+    if (ministrosSelecionados.includes(nome)) {
 
-        ministrosSelecionados =
-        ministrosSelecionados.filter(x=>x!==nome);
-
+        ministrosSelecionados = ministrosSelecionados.filter(x => x !== nome);
         el.classList.remove("active");
 
-    }else{
+    } else {
 
         ministrosSelecionados.push(nome);
         el.classList.add("active");
-
     }
 };
 
-window.salvarEscala = function(){
+window.salvarEscala = function() {
 
     let data = document.getElementById("dataEscala").value;
     let hora = document.getElementById("horaEscala").value;
 
-    if(!data || !hora){
+    if (!data || !hora) {
         alert("Preencha data e hora.");
         return;
     }
 
-    if(ministrosSelecionados.length===0){
+    if (ministrosSelecionados.length === 0) {
         alert("Selecione ministros.");
         return;
     }
 
     db.collection("escalas").add({
-        data:data,
-        hora:hora,
-        ministros:ministrosSelecionados
-    }).then(()=>{
+        data: data,
+        hora: hora,
+        ministros: ministrosSelecionados
+    }).then(() => {
         listarEscalas();
         atualizarCalendario();
-
         alert("Escala salva!");
     });
-
 };
 
-function listarEscalas(){
+function listarEscalas() {
 
     let lista = document.getElementById("listaEscalasCards");
-    lista.innerHTML="";
+    lista.innerHTML = "";
 
     db.collection("escalas").orderBy("data").get()
-    .then(snapshot=>{
+    .then(snapshot => {
 
-        snapshot.forEach(doc=>{
+        snapshot.forEach(doc => {
 
             let e = doc.data();
 
             lista.innerHTML += `
             <div class="card" style="padding:14px;margin-bottom:10px">
-
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
-
-            <div>
-            <strong>${formatarDataCompleta(e.data)}</strong> - ${e.hora}
-            </div>
-
-            <div class="botoes-linha">
-
-            <button class="btn-edit"
-            onclick="editarEscala('${doc.id}','${e.data}','${e.hora}')">
-            Editar
-            </button>
-
-            <button class="btn-delete"
-            onclick="deletarEscala('${doc.id}')">
-            Excluir
-            </button>
-
-            </div>
-
-            </div>
-
-            <div style="margin-top:10px;color:#555">
-            ${e.ministros.join(", ")}
-            </div>
-
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+                    <div>
+                        <strong>${formatarDataCompleta(e.data)}</strong> - ${e.hora}
+                    </div>
+                    <div class="botoes-linha">
+                        <button class="btn-edit" onclick="editarEscala('${doc.id}','${e.data}','${e.hora}')">Editar</button>
+                        <button class="btn-delete" onclick="deletarEscala('${doc.id}')">Excluir</button>
+                    </div>
+                </div>
+                <div style="margin-top:10px;color:#555">${e.ministros.join(", ")}</div>
             </div>
             `;
         });
-
     });
-
 }
 
-window.deletarEscala = function(id){
+window.deletarEscala = function(id) {
 
-    if(!confirm("Excluir escala?")) return;
+    if (!confirm("Excluir escala?")) return;
 
-    db.collection("escalas").doc(id).delete().then(()=>{
+    db.collection("escalas").doc(id).delete().then(() => {
         listarEscalas();
         atualizarCalendario();
     });
@@ -253,46 +217,45 @@ window.deletarEscala = function(id){
 /* =========================================
 CALENDÁRIO
 ========================================= */
-function iniciarCalendario(){
+function iniciarCalendario() {
 
-    if(calendarAdmin){
+    if (calendarAdmin) {
         atualizarCalendario();
         return;
     }
 
     calendarAdmin = new FullCalendar.Calendar(
-        document.getElementById("calendarAdmin"),{
+        document.getElementById("calendarAdmin"), {
 
-        initialView:"dayGridMonth",
-        locale:"pt-br",
-        height:"auto",
-        contentHeight:"auto",
+        initialView: "dayGridMonth",
+        locale: "pt-br",
+        height: "auto",
+        contentHeight: "auto",
 
-        headerToolbar:{
-        left:"prev,next today",
-        center:"title",
-        right:""
+        headerToolbar: {
+            left: "prev,next today",
+            center: "title",
+            right: ""
         },
 
-        buttonText:{
-        today:"Hoje"
+        buttonText: {
+            today: "Hoje"
         },
 
-        eventDisplay:"list-item",
+        eventDisplay: "list-item",
 
-        eventClick:function(info){
+        eventClick: function(info) {
 
-        alert(
-        "Data: " + formatarDataCompleta(info.event.startStr) +
-        "\nHora: " + info.event.title +
-        "\nMinistros: " +
-        (info.event.extendedProps.ministros || []).join(", ")
-        );
-
+            alert(
+                "Data: " + formatarDataCompleta(info.event.startStr) +
+                "\nHora: " + info.event.title +
+                "\nMinistros: " +
+                (info.event.extendedProps.ministros || []).join(", ")
+            );
         },
 
-        datesSet:function(){
-        setTimeout(ajustarTituloCalendario,100);
+        datesSet: function() {
+            setTimeout(ajustarTituloCalendario, 100);
         }
 
     });
@@ -302,132 +265,126 @@ function iniciarCalendario(){
     atualizarCalendario();
 }
 
-function atualizarCalendario(){
+function atualizarCalendario() {
 
-    if(!calendarAdmin) return;
+    if (!calendarAdmin) return;
 
     calendarAdmin.removeAllEvents();
 
-    db.collection("escalas").get().then(snapshot=>{
+    db.collection("escalas").get().then(snapshot => {
 
-    snapshot.forEach(doc=>{
+        snapshot.forEach(doc => {
 
-    let e = doc.data();
+            let e = doc.data();
 
-    calendarAdmin.addEvent({
-    title:e.hora,
-    start:e.data,
-    ministros:e.ministros
-    });
+            calendarAdmin.addEvent({
+                title: e.hora,
+                start: e.data,
+                ministros: e.ministros
+            });
 
+        });
     });
 }
 
-function ajustarTituloCalendario(){
+function ajustarTituloCalendario() {
 
     let t = document.querySelector(".fc-toolbar-title");
-    if(!t) return;
+    if (!t) return;
 
     t.innerText =
-    t.innerText.charAt(0).toUpperCase() +
-    t.innerText.slice(1);
-
+        t.innerText.charAt(0).toUpperCase() +
+        t.innerText.slice(1);
 }
 
 /* =========================================
 PDF COM LOGO
 ========================================= */
-window.gerarPDF = function(){
+window.gerarPDF = function() {
 
     db.collection("escalas").orderBy("data").get()
-    .then(snapshot=>{
+    .then(snapshot => {
 
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
 
-    let y = 20;
+        let y = 20;
 
-    /* Carregar logo */
-    let img = new Image();
-    img.src = "logo.png";
+        /* Carregar logo */
+        let img = new Image();
+        img.src = "logo.png";
 
-    img.onload = function(){
+        img.onload = function() {
 
-    doc.addImage(img,"PNG",10,10,18,18);
+            doc.addImage(img, "PNG", 10, 10, 18, 18);
+            doc.setFontSize(18);
+            doc.text("Paróquia Santíssima Trindade", 35, 16); // Alinha título à direita do logo
 
-    doc.setFontSize(18);
-    doc.text("Paróquia Santíssima Trindade", 35, 16); // Alinha título à direita do logo
+            y = 45;
 
-    y = 45;  // A partir daqui começa o conteúdo das escalas
+            let agrupado = {};
 
-    let agrupado = {};
+            snapshot.forEach(item => {
+                let e = item.data();
 
-    snapshot.forEach(item=>{
-        let e = item.data();
+                if (!agrupado[e.data]) {
+                    agrupado[e.data] = [];
+                }
 
-        if(!agrupado[e.data]){
-            agrupado[e.data] = [];
-        }
+                agrupado[e.data].push(e);
+            });
 
-        agrupado[e.data].push(e);
+            // Exibe cada data e suas escalas
+            for (let data in agrupado) {
+
+                doc.setFontSize(11);
+                doc.setFont(undefined, "bold");
+                doc.text(formatarDataCompleta(data), 10, y);
+                y += 6;
+
+                doc.setFont(undefined, "normal");
+
+                agrupado[data].forEach(item => {
+                    doc.text(
+                        item.hora + "h - Ministros: " + item.ministros.join(", "),
+                        12,
+                        y
+                    );
+                    y += 6;
+                });
+
+                y += 10;
+
+                if (y > 275) {
+                    doc.addPage();
+                    y = 20;
+                }
+
+            }
+
+            doc.save("escala-ministros.pdf");
+        };
     });
-
-    // Exibe cada data e suas escalas
-    for(let data in agrupado){
-
-    doc.setFontSize(11);
-    doc.setFont(undefined,"bold");
-    doc.text(formatarDataCompleta(data), 10, y);
-    y += 6;
-
-    doc.setFont(undefined,"normal");
-
-    agrupado[data].forEach(item=>{
-        doc.text(
-            item.hora + "h - Ministros: " + item.ministros.join(", "),
-            12,
-            y
-        );
-
-        y += 6;  // Espaçamento entre horários
-    });
-
-    y += 10;  // Espaço entre os dias
-
-    if(y > 275){
-        doc.addPage();
-        y = 20;
-    }
-
-    }
-
-    doc.save("escala-ministros.pdf");
-
-    };
-
-    });
-
 };
 
 /* =========================================
 UTIL
 ========================================= */
-function formatarDataCompleta(dataISO){
+function formatarDataCompleta(dataISO) {
 
-const data = new Date(dataISO + "T00:00:00");
+    const data = new Date(dataISO + "T00:00:00");
 
-return data.toLocaleDateString("pt-BR",{
-weekday:"long",
-day:"numeric",
-month:"long",
-year:"numeric"
-}).replace(/^./, c => c.toUpperCase());
-
+    return data.toLocaleDateString("pt-BR", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+    }).replace(/^./, c => c.toUpperCase());
 }
 
 /* =========================================
 INÍCIO
 ========================================= */
-window.onload = function(){
-abrirTela("dashboard");
+window.onload = function() {
+    abrirTela("dashboard");
 };
