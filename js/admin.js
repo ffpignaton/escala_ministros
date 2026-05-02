@@ -321,8 +321,6 @@ function atualizarCalendario(){
     });
 
     });
-
-    });
 }
 
 function ajustarTituloCalendario(){
