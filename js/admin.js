@@ -1,3 +1,5 @@
+alert("ADMIN JS NOVO CARREGOU");
+
 document.addEventListener("DOMContentLoaded", function(){
 
 /* ===================================
