@@ -12,7 +12,6 @@ let calendarAdmin = null;
 ABRIR TELAS
 ========================================= */
 window.abrirTela = function(id){
-
     // Esconde todas as telas
     document.querySelectorAll(".tela").forEach(sec => {
         sec.classList.add("hidden");
@@ -40,7 +39,6 @@ window.abrirTela = function(id){
 MINISTROS
 ========================================= */
 window.salvarMinistro = function(){
-
     let nome = document.getElementById("nome").value.trim();
     let fone = document.getElementById("fone").value.trim();
 
@@ -53,22 +51,18 @@ window.salvarMinistro = function(){
         nome: nome,
         fone: fone
     }).then(() => {
-
         document.getElementById("nome").value = "";
         document.getElementById("fone").value = "";
-
         carregarMinistros();
         alert("Ministro salvo!");
     });
 };
 
 function carregarMinistros() {
-
     let lista = document.getElementById("listaMinistros");
     lista.innerHTML = "";
 
     db.collection("ministros").get().then(snapshot => {
-
         snapshot.forEach(doc => {
             let m = doc.data();
 
@@ -90,7 +84,6 @@ function carregarMinistros() {
 }
 
 window.editarMinistro = function(id, nomeAtual, foneAtual) {
-
     let novoNome = prompt("Nome:", nomeAtual);
     if (!novoNome) return;
 
@@ -105,7 +98,6 @@ window.editarMinistro = function(id, nomeAtual, foneAtual) {
 };
 
 window.deletarMinistro = function(id) {
-
     if (!confirm("Excluir ministro?")) return;
 
     db.collection("ministros").doc(id).delete()
@@ -116,17 +108,13 @@ window.deletarMinistro = function(id) {
 ESCALAS
 ========================================= */
 function carregarMinistrosEscala() {
-
     let box = document.getElementById("seletorMinistros");
     box.innerHTML = "";
     ministrosSelecionados = [];
 
     db.collection("ministros").get().then(snapshot => {
-
         snapshot.forEach(doc => {
-
             let nome = doc.data().nome;
-
             box.innerHTML += `
             <div class="tag" onclick="toggleMinistro(this,'${nome}')">${nome}</div>
             `;
@@ -135,21 +123,16 @@ function carregarMinistrosEscala() {
 }
 
 window.toggleMinistro = function(el, nome) {
-
     if (ministrosSelecionados.includes(nome)) {
-
         ministrosSelecionados = ministrosSelecionados.filter(x => x !== nome);
         el.classList.remove("active");
-
     } else {
-
         ministrosSelecionados.push(nome);
         el.classList.add("active");
     }
 };
 
 window.salvarEscala = function() {
-
     let data = document.getElementById("dataEscala").value;
     let hora = document.getElementById("horaEscala").value;
 
@@ -175,15 +158,12 @@ window.salvarEscala = function() {
 };
 
 function listarEscalas() {
-
     let lista = document.getElementById("listaEscalasCards");
     lista.innerHTML = "";
 
     db.collection("escalas").orderBy("data").get()
     .then(snapshot => {
-
         snapshot.forEach(doc => {
-
             let e = doc.data();
 
             lista.innerHTML += `
@@ -205,7 +185,6 @@ function listarEscalas() {
 }
 
 window.deletarEscala = function(id) {
-
     if (!confirm("Excluir escala?")) return;
 
     db.collection("escalas").doc(id).delete().then(() => {
@@ -218,7 +197,6 @@ window.deletarEscala = function(id) {
 CALENDÁRIO
 ========================================= */
 function iniciarCalendario() {
-
     if (calendarAdmin) {
         atualizarCalendario();
         return;
@@ -226,26 +204,20 @@ function iniciarCalendario() {
 
     calendarAdmin = new FullCalendar.Calendar(
         document.getElementById("calendarAdmin"), {
-
         initialView: "dayGridMonth",
         locale: "pt-br",
         height: "auto",
         contentHeight: "auto",
-
         headerToolbar: {
             left: "prev,next today",
             center: "title",
             right: ""
         },
-
         buttonText: {
             today: "Hoje"
         },
-
         eventDisplay: "list-item",
-
         eventClick: function(info) {
-
             alert(
                 "Data: " + formatarDataCompleta(info.event.startStr) +
                 "\nHora: " + info.event.title +
@@ -253,11 +225,9 @@ function iniciarCalendario() {
                 (info.event.extendedProps.ministros || []).join(", ")
             );
         },
-
         datesSet: function() {
             setTimeout(ajustarTituloCalendario, 100);
         }
-
     });
 
     calendarAdmin.render();
@@ -266,15 +236,12 @@ function iniciarCalendario() {
 }
 
 function atualizarCalendario() {
-
     if (!calendarAdmin) return;
 
     calendarAdmin.removeAllEvents();
 
     db.collection("escalas").get().then(snapshot => {
-
         snapshot.forEach(doc => {
-
             let e = doc.data();
 
             calendarAdmin.addEvent({
@@ -282,13 +249,11 @@ function atualizarCalendario() {
                 start: e.data,
                 ministros: e.ministros
             });
-
         });
     });
 }
 
 function ajustarTituloCalendario() {
-
     let t = document.querySelector(".fc-toolbar-title");
     if (!t) return;
 
@@ -301,10 +266,8 @@ function ajustarTituloCalendario() {
 PDF COM LOGO
 ========================================= */
 window.gerarPDF = function() {
-
     db.collection("escalas").orderBy("data").get()
     .then(snapshot => {
-
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
 
@@ -315,18 +278,15 @@ window.gerarPDF = function() {
         img.src = "logo.png";
 
         img.onload = function() {
-
             doc.addImage(img, "PNG", 10, 10, 18, 18);
             doc.setFontSize(18);
             doc.text("Paróquia Santíssima Trindade", 35, 16); // Alinha título à direita do logo
-
             y = 45;
 
             let agrupado = {};
 
             snapshot.forEach(item => {
                 let e = item.data();
-
                 if (!agrupado[e.data]) {
                     agrupado[e.data] = [];
                 }
@@ -336,7 +296,6 @@ window.gerarPDF = function() {
 
             // Exibe cada data e suas escalas
             for (let data in agrupado) {
-
                 doc.setFontSize(11);
                 doc.setFont(undefined, "bold");
                 doc.text(formatarDataCompleta(data), 10, y);
@@ -359,7 +318,6 @@ window.gerarPDF = function() {
                     doc.addPage();
                     y = 20;
                 }
-
             }
 
             doc.save("escala-ministros.pdf");
@@ -371,9 +329,7 @@ window.gerarPDF = function() {
 UTIL
 ========================================= */
 function formatarDataCompleta(dataISO) {
-
     const data = new Date(dataISO + "T00:00:00");
-
     return data.toLocaleDateString("pt-BR", {
         weekday: "long",
         day: "numeric",
