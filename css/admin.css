@@ -2,30 +2,23 @@ body{
 margin:0;
 font-family:Arial,Helvetica,sans-serif;
 background:#eef2f7;
-color:#222;
 }
 
-/* ESCONDER TELAS */
+/* ESSA LINHA RESOLVE */
 .hidden{
-display:none !important;
+display:none;
 }
 
-/* LAYOUT */
 .dashboard{
 display:flex;
 min-height:100vh;
 }
 
-/* MENU */
 .sidebar{
 width:230px;
 background:#1f4fa3;
 color:white;
 padding:20px;
-}
-
-.sidebar h2{
-margin-top:0;
 }
 
 .menu-item{
@@ -40,17 +33,11 @@ cursor:pointer;
 background:rgba(255,255,255,0.2);
 }
 
-/* CONTEÚDO */
 .main{
 flex:1;
 padding:25px;
 }
 
-.topo{
-margin-bottom:20px;
-}
-
-/* CARDS */
 .card{
 background:white;
 padding:20px;
@@ -59,31 +46,27 @@ margin-bottom:20px;
 box-shadow:0 2px 8px rgba(0,0,0,0.08);
 }
 
-/* INPUTS */
 input{
 width:100%;
 padding:10px;
 margin-bottom:10px;
-border-radius:8px;
 border:1px solid #ccc;
+border-radius:8px;
 }
 
-/* BOTÕES */
 button{
 background:#1f4fa3;
 color:white;
 border:none;
-padding:10px 14px;
+padding:10px 15px;
 border-radius:8px;
 cursor:pointer;
 }
 
-/* TAGS */
 .tags-box{
 display:flex;
 flex-wrap:wrap;
 gap:8px;
-margin-top:10px;
 }
 
 .tag{
@@ -91,52 +74,9 @@ padding:6px 10px;
 background:#ddd;
 border-radius:20px;
 cursor:pointer;
-font-size:13px;
 }
 
 .tag.active{
 background:#1f4fa3;
 color:white;
-}
-
-/* ESCALAS */
-.escala-card{
-background:white;
-padding:15px;
-border-radius:10px;
-margin-bottom:15px;
-box-shadow:0 2px 6px rgba(0,0,0,0.08);
-}
-
-.escala-header{
-display:flex;
-justify-content:space-between;
-margin-bottom:10px;
-}
-
-.escala-actions{
-display:flex;
-gap:8px;
-justify-content:flex-end;
-margin-top:10px;
-}
-
-.btn-edit{
-background:#3498db;
-padding:6px 10px;
-font-size:12px;
-}
-
-.btn-delete{
-background:#e74c3c;
-padding:6px 10px;
-font-size:12px;
-}
-
-/* MODAL */
-.modal-box{
-background:white;
-padding:20px;
-border-radius:12px;
-width:320px;
 }
