@@ -1,9 +1,7 @@
-alert("ADMIN MASTER FINAL");
+alert("ADMIN MASTER CALENDÁRIO");
 
 /* ================================= */
 let ministrosSelecionados = [];
-let ministrosEdicao = [];
-let escalaEditandoId = null;
 let calendarAdmin = null;
 
 /* ================================= */
@@ -27,7 +25,9 @@ iniciarCalendario();
 
 };
 
-/* ================================= */
+/* ===================================
+MÁSCARA TELEFONE
+=================================== */
 window.mascaraTelefone = function(campo){
 
 let v = campo.value.replace(/\D/g,'');
@@ -53,15 +53,11 @@ let fone = document.getElementById("fone").value.trim();
 if(!nome) return alert("Digite o nome");
 
 db.collection("ministros").add({
-nome:nome,
-fone:fone
+nome,fone
 }).then(()=>{
-
 document.getElementById("nome").value="";
 document.getElementById("fone").value="";
-
 carregarMinistros();
-
 });
 
 };
@@ -80,13 +76,7 @@ let m = doc.data();
 lista.innerHTML += `
 <div class="card" style="padding:12px;margin-bottom:10px">
 
-<div style="
-display:flex;
-justify-content:space-between;
-align-items:center;
-gap:10px;
-flex-wrap:wrap;
-">
+<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
 
 <div>
 <strong>${m.nome}</strong> - ${m.fone || ""}
@@ -105,7 +95,6 @@ Excluir
 </button>
 
 </div>
-
 </div>
 </div>
 `;
@@ -124,8 +113,7 @@ if(!nome) return;
 let fone = prompt("Telefone:",f);
 
 db.collection("ministros").doc(id).update({
-nome:nome,
-fone:fone
+nome,fone
 }).then(carregarMinistros);
 
 };
@@ -193,14 +181,12 @@ let hora = document.getElementById("horaEscala").value;
 if(!data || !hora) return alert("Preencha data e hora");
 
 db.collection("escalas").add({
-data:data,
-hora:hora,
+data,
+hora,
 ministros:ministrosSelecionados
 }).then(()=>{
-
 listarEscalas();
 atualizarCalendario();
-
 });
 
 };
@@ -220,13 +206,7 @@ let e = doc.data();
 lista.innerHTML += `
 <div class="card" style="padding:14px;margin-bottom:10px">
 
-<div style="
-display:flex;
-justify-content:space-between;
-align-items:center;
-gap:10px;
-flex-wrap:wrap;
-">
+<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
 
 <div>
 <strong>${e.data}</strong> - ${e.hora}
@@ -234,8 +214,7 @@ flex-wrap:wrap;
 
 <div class="botoes-linha">
 
-<button class="btn-edit"
-onclick="editarEscala('${doc.id}','${e.data}','${e.hora}')">
+<button class="btn-edit">
 Editar
 </button>
 
@@ -261,8 +240,20 @@ ${e.ministros.join(", ")}
 
 }
 
+window.deletarEscala = function(id){
+
+if(!confirm("Excluir escala?")) return;
+
+db.collection("escalas").doc(id).delete()
+.then(()=>{
+listarEscalas();
+atualizarCalendario();
+});
+
+};
+
 /* ===================================
-CALENDÁRIO
+CALENDÁRIO NOVO
 =================================== */
 function iniciarCalendario(){
 
@@ -274,17 +265,71 @@ return;
 let el = document.getElementById("calendarAdmin");
 
 calendarAdmin = new FullCalendar.Calendar(el,{
+
 initialView:"dayGridMonth",
 locale:"pt-br",
-height:"auto"
+height:420,
+
+headerToolbar:{
+left:"prev,next today",
+center:"title",
+right:""
+},
+
+buttonText:{
+today:"Hoje"
+},
+
+dayMaxEvents:false,
+
+eventDisplay:"list-item",
+
+eventClick:function(info){
+
+alert(
+"Data: " + info.event.startStr +
+"\nHora: " + info.event.title
+);
+
+},
+
+datesSet:function(){
+
+setTimeout(()=>{
+ajustarTituloCalendario();
+},100);
+
+}
+
 });
 
 calendarAdmin.render();
+
+ajustarTituloCalendario();
 
 atualizarCalendario();
 
 }
 
+/* ===================================
+MAIÚSCULA NO MÊS
+=================================== */
+function ajustarTituloCalendario(){
+
+let titulo = document.querySelector(".fc-toolbar-title");
+
+if(!titulo) return;
+
+let txt = titulo.innerText;
+
+titulo.innerText =
+txt.charAt(0).toUpperCase() + txt.slice(1);
+
+}
+
+/* ===================================
+ATUALIZAR EVENTOS
+=================================== */
 function atualizarCalendario(){
 
 if(!calendarAdmin) return;
@@ -298,8 +343,10 @@ snapshot.forEach(doc=>{
 let e = doc.data();
 
 calendarAdmin.addEvent({
-title:e.hora + " - " + e.ministros.join(", "),
+
+title:e.hora,
 start:e.data
+
 });
 
 });
@@ -309,25 +356,9 @@ start:e.data
 }
 
 /* ===================================
-OUTROS
+PDF
 =================================== */
-window.editarEscala = function(){
-alert("Editar escala continua funcionando no modal anterior.");
-};
-
-window.deletarEscala = function(id){
-
-if(!confirm("Excluir escala?")) return;
-
-db.collection("escalas").doc(id).delete()
-.then(()=>{
-listarEscalas();
-atualizarCalendario();
-});
-
-};
-
-window.gerarPDF = function(){
+window.gerarPDF=function(){
 alert("PDF em breve");
 };
 
