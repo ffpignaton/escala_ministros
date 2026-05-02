@@ -1,4 +1,4 @@
-alert("ADMIN JS MASTER FINAL");
+alert("ADMIN JS MASTER FINAL V2");
 
 /* =========================================
 VARIÁVEIS GLOBAIS
@@ -90,15 +90,7 @@ let m = doc.data();
 
 lista.innerHTML += `
 <div class="card" style="padding:12px;margin-bottom:10px">
-
-<div style="
-display:flex;
-justify-content:space-between;
-align-items:center;
-gap:10px;
-flex-wrap:wrap;
-">
-
+<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
 <div>
 <strong>${m.nome}</strong> - ${m.fone || ""}
 </div>
@@ -116,7 +108,6 @@ Excluir
 </button>
 
 </div>
-
 </div>
 </div>
 `;
@@ -137,9 +128,7 @@ let novoFone = prompt("Telefone:", foneAtual);
 db.collection("ministros").doc(id).update({
 nome:novoNome,
 fone:novoFone
-}).then(()=>{
-carregarMinistros();
-});
+}).then(carregarMinistros);
 
 };
 
@@ -243,16 +232,10 @@ let e = doc.data();
 lista.innerHTML += `
 <div class="card" style="padding:14px;margin-bottom:10px">
 
-<div style="
-display:flex;
-justify-content:space-between;
-align-items:center;
-gap:10px;
-flex-wrap:wrap;
-">
+<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
 
 <div>
-<strong>${formatarBrasil(e.data)}</strong> - ${e.hora}
+<strong>${formatarDataCompleta(e.data)}</strong> - ${e.hora}
 </div>
 
 <div class="botoes-linha">
@@ -268,7 +251,6 @@ Excluir
 </button>
 
 </div>
-
 </div>
 
 <div style="margin-top:10px;color:#555">
@@ -284,12 +266,9 @@ ${e.ministros.join(", ")}
 
 }
 
-/* =========================================
-EDITAR ESCALA
-========================================= */
 window.editarEscala = function(id,dataAtual,horaAtual){
 
-alert("Modal edição pode continuar no seu sistema atual.");
+alert("Seu modal de edição continua ativo.");
 
 };
 
@@ -305,7 +284,7 @@ atualizarCalendario();
 };
 
 /* =========================================
-CALENDÁRIO
+CALENDÁRIO SEM ROLAGEM
 ========================================= */
 function iniciarCalendario(){
 
@@ -320,7 +299,10 @@ calendarAdmin = new FullCalendar.Calendar(el,{
 
 initialView:"dayGridMonth",
 locale:"pt-br",
-height:360,
+
+height:"auto",
+contentHeight:"auto",
+aspectRatio:1.4,
 
 fixedWeekCount:false,
 expandRows:true,
@@ -343,7 +325,7 @@ let ministros =
 info.event.extendedProps.ministros || [];
 
 alert(
-"Data: " + formatarBrasil(info.event.startStr) +
+"Data: " + formatarDataCompleta(info.event.startStr) +
 "\nHora: " + info.event.title +
 "\nMinistros: " + ministros.join(", ")
 );
@@ -363,7 +345,6 @@ ajustarTituloCalendario();
 calendarAdmin.render();
 
 ajustarTituloCalendario();
-
 atualizarCalendario();
 
 }
@@ -413,13 +394,18 @@ alert("PDF em breve.");
 };
 
 /* =========================================
-UTIL
+FORMATOS DE DATA
 ========================================= */
-function formatarBrasil(data){
+function formatarDataCompleta(dataISO){
 
-let partes = data.split("-");
+const data = new Date(dataISO + "T00:00:00");
 
-return partes[2] + "/" + partes[1] + "/" + partes[0];
+return data.toLocaleDateString("pt-BR",{
+weekday:"long",
+day:"numeric",
+month:"long",
+year:"numeric"
+}).replace(/^./, c => c.toUpperCase());
 
 }
 
