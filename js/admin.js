@@ -300,7 +300,7 @@ window.gerarPDF = function() {
             for (let data in agrupado) {
                 doc.setFontSize(8);
                 doc.setFont(undefined, "bold");
-                doc.text(formatarDataCompleta(data), 5, y);
+                doc.text(formatarDataCompleta(data), 10, y);
                 y += 5;
 
                 doc.setFont(undefined, "normal");
