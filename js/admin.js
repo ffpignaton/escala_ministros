@@ -281,7 +281,7 @@ window.gerarPDF = function() {
             doc.addImage(img, "PNG", 10, 10, 18, 18);
             doc.setFontSize(18);
             doc.text("Paróquia Santíssima Trindade", 35, 16); // Alinha título à direita do logo
-            y = 60;
+            y = 50;
 
             let agrupado = {};
 
@@ -299,20 +299,20 @@ window.gerarPDF = function() {
                 doc.setFontSize(12);
                 doc.setFont(undefined, "bold");
                 doc.text(formatarDataCompleta(data), 10, y);
-                y += 8;
+                y += 5;
 
                 doc.setFont(undefined, "normal");
 
                 agrupado[data].forEach(item => {
                     doc.text(
                         item.hora + "h - Ministros: " + item.ministros.join(", "),
-                        10,
+                        5,
                         y
                     );
-                    y += 10;
+                    y += 5;
                 });
 
-                y += 10;
+                y += 5;
 
                 if (y > 275) {
                     doc.addPage();
