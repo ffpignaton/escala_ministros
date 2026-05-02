@@ -299,14 +299,14 @@ window.gerarPDF = function() {
                 doc.setFontSize(12);
                 doc.setFont(undefined, "bold");
                 doc.text(formatarDataCompleta(data), 10, y);
-                y += 10;
+                y += 5;
 
                 doc.setFont(undefined, "normal");
 
                 agrupado[data].forEach(item => {
                     doc.text(
                         item.hora + "h - Ministros: " + item.ministros.join(", "),
-                        5,
+                        10,
                         y
                     );
                     y += 5;
