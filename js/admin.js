@@ -301,7 +301,7 @@ window.gerarPDF = function() {
                 doc.setFontSize(8);
                 doc.setFont(undefined, "bold");
                 doc.text(formatarDataCompleta(data), 10, y);
-                y += 5;
+                y += 1;
 
                 doc.setFont(undefined, "normal");
 
@@ -311,10 +311,10 @@ window.gerarPDF = function() {
                         10,
                         y
                     );
-                    y += 5;
+                    y += 1;
                 });
 
-                y += 5;
+                y += 1;
 
                 if (y > 275) {
                     doc.addPage();
