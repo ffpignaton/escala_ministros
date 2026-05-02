@@ -282,7 +282,7 @@ window.gerarPDF = function() {
             doc.setFontSize(18);
             doc.text("Paróquia Santíssima Trindade - Matriz São Jorge", 30, 20); // Alinha título à direita do logo
             doc.setFontSize(10)
-            doc.text("Escala Ministros Extraordinários da Distribuição da Sagrada Comunhão", 30, 24);
+            doc.text("Escala Ministros Extraordinários da Distribuição da Sagrada Comunhão", 30, 25);
             y = 35;
 
             let agrupado = {};
@@ -298,7 +298,7 @@ window.gerarPDF = function() {
 
             // Exibe cada data e suas escalas
             for (let data in agrupado) {
-                doc.setFontSize(5);
+                doc.setFontSize(8);
                 doc.setFont(undefined, "bold");
                 doc.text(formatarDataCompleta(data), 10, y);
                 y += 5;
