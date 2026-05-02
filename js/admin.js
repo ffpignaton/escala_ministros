@@ -1,9 +1,8 @@
-alert("ADMIN JS MASTER FINAL RESUMIDO");
+alert("ADMIN JS MASTER FINAL COM RELATÓRIO PDF");
 
-/* =========================================
-VARIÁVEIS GLOBAIS
-========================================= */
 let ministrosSelecionados = [];
+let ministrosEdicao = [];
+let escalaEditandoId = null;
 let calendarAdmin = null;
 
 /* =========================================
@@ -25,8 +24,6 @@ if(id==="escalas"){
 carregarMinistrosEscala();
 listarEscalas();
 iniciarCalendario();
-}
-
 };
 
 /* =========================================
@@ -92,17 +89,19 @@ Excluir
 
 }
 
-window.editarMinistro = function(id,n,f){
+window.editarMinistro = function(id,nomeAtual,foneAtual){
 
-let nome = prompt("Nome:",n);
-if(!nome) return;
+let novoNome = prompt("Nome:", nomeAtual);
+if(!novoNome) return;
 
-let fone = prompt("Telefone:",f);
+let novoFone = prompt("Telefone:", foneAtual);
 
 db.collection("ministros").doc(id).update({
-nome:nome,
-fone:fone
-}).then(carregarMinistros);
+nome:novoNome,
+fone:novoFone
+}).then(()=>{
+carregarMinistros();
+});
 
 };
 
@@ -192,9 +191,34 @@ snapshot.forEach(doc=>{
 let e = doc.data();
 
 lista.innerHTML += `
-<div class="card" style="padding:12px;margin-bottom:10px">
-<strong>${formatarDataCompleta(e.data)}</strong> - ${e.hora}<br>
+<div class="card" style="padding:14px;margin-bottom:10px">
+
+<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+
+<div>
+<strong>${formatarDataCompleta(e.data)}</strong> - ${e.hora}
+</div>
+
+<div class="botoes-linha">
+
+<button class="btn-edit"
+onclick="editarEscala('${doc.id}','${e.data}','${e.hora}')">
+Editar
+</button>
+
+<button class="btn-delete"
+onclick="deletarEscala('${doc.id}')">
+Excluir
+</button>
+
+</div>
+
+</div>
+
+<div style="margin-top:10px;color:#555">
 ${e.ministros.join(", ")}
+</div>
+
 </div>
 `;
 
@@ -208,8 +232,7 @@ window.deletarEscala = function(id){
 
 if(!confirm("Excluir escala?")) return;
 
-db.collection("escalas").doc(id).delete()
-.then(()=>{
+db.collection("escalas").doc(id).delete().then(()=>{
 listarEscalas();
 atualizarCalendario();
 });
@@ -305,7 +328,7 @@ t.innerText.slice(1);
 }
 
 /* =========================================
-PDF RESUMIDO EM 1 FOLHA
+PDF COM LOGO
 ========================================= */
 window.gerarPDF = function(){
 
@@ -315,63 +338,58 @@ db.collection("escalas").orderBy("data").get()
 const { jsPDF } = window.jspdf;
 const doc = new jsPDF();
 
-let y = 15;
+let y = 20;
 
-/* LOGO */
+/* Carregar logo */
 let img = new Image();
 img.src = "logo.png";
 
 img.onload = function(){
 
-doc.addImage(img,"PNG",10,8,18,18);
+doc.addImage(img,"PNG",10,10,18,18);
 
-doc.setFontSize(15);
-doc.text("Paróquia Santíssima Trindade",35,16);
+doc.setFontSize(18);
+doc.text("Paróquia Santíssima Trindade", 35, 16); // Alinha título à direita do logo
 
-y = 32;
+y = 45;  // A partir daqui começa o conteúdo das escalas
 
-/* organizar por data */
 let agrupado = {};
 
 snapshot.forEach(item=>{
+    let e = item.data();
 
-let e = item.data();
+    if(!agrupado[e.data]){
+        agrupado[e.data] = [];
+    }
 
-if(!agrupado[e.data]){
-agrupado[e.data] = [];
-}
-
-agrupado[e.data].push(e);
-
+    agrupado[e.data].push(e);
 });
 
+// Exibe cada data e suas escalas
 for(let data in agrupado){
 
 doc.setFontSize(11);
 doc.setFont(undefined,"bold");
-doc.text(formatarDataCompleta(data),10,y);
+doc.text(formatarDataCompleta(data), 10, y);
 y += 6;
 
 doc.setFont(undefined,"normal");
 
 agrupado[data].forEach(item=>{
+    doc.text(
+        item.hora + "h - Ministros: " + item.ministros.join(", "),
+        12,
+        y
+    );
 
-doc.text(
-item.hora + "h - Ministros: " +
-item.ministros.join(", "),
-12,
-y
-);
-
-y += 5;
-
+    y += 6;  // Espaçamento entre horários
 });
 
-y += 5;
+y += 10;  // Espaço entre os dias
 
 if(y > 275){
-doc.addPage();
-y = 15;
+    doc.addPage();
+    y = 20;
 }
 
 }
