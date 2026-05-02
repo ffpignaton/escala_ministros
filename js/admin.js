@@ -299,7 +299,7 @@ window.gerarPDF = function() {
                 doc.setFontSize(12);
                 doc.setFont(undefined, "bold");
                 doc.text(formatarDataCompleta(data), 10, y);
-                y += 5;
+                y += 10;
 
                 doc.setFont(undefined, "normal");
 
