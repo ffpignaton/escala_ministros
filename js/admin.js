@@ -271,7 +271,7 @@ window.gerarPDF = function() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
 
-        let y = 25;
+        let y = 40;
 
         /* Carregar logo */
         let img = new Image();
@@ -281,7 +281,7 @@ window.gerarPDF = function() {
             doc.addImage(img, "PNG", 10, 10, 18, 18);
             doc.setFontSize(18);
             doc.text("Paróquia Santíssima Trindade", 35, 16); // Alinha título à direita do logo
-            y = 25;
+            y = 10;
 
             let agrupado = {};
 
