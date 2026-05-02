@@ -1,4 +1,4 @@
-alert("ADMIN JS MASTER FINAL COM RELATÓRIO PDF");
+alert("BEM VINDO AO PAINEL ADMINISTRATIVO");
 
 /* =========================================
 VARIÁVEIS GLOBAIS
