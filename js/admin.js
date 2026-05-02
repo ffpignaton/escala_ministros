@@ -309,7 +309,7 @@ window.gerarPDF = function() {
                         10,
                         y
                     );
-                    y += 6;
+                    y += 10;
                 });
 
                 y += 10;
