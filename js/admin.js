@@ -1,11 +1,9 @@
-alert("ADMIN JS MASTER FINAL");
+alert("ADMIN JS MASTER FINAL RESUMIDO");
 
 /* =========================================
 VARIÁVEIS GLOBAIS
 ========================================= */
 let ministrosSelecionados = [];
-let ministrosEdicao = [];
-let escalaEditandoId = null;
 let calendarAdmin = null;
 
 /* =========================================
@@ -29,33 +27,25 @@ listarEscalas();
 iniciarCalendario();
 }
 
+};
+
 /* =========================================
 MINISTROS
 ========================================= */
-};
-
 window.salvarMinistro = function(){
 
 let nome = document.getElementById("nome").value.trim();
 let fone = document.getElementById("fone").value.trim();
 
-if(!nome){
-alert("Digite o nome.");
-return;
-}
+if(!nome) return alert("Digite o nome.");
 
 db.collection("ministros").add({
 nome:nome,
 fone:fone
 }).then(()=>{
-
 document.getElementById("nome").value="";
 document.getElementById("fone").value="";
-
 carregarMinistros();
-
-alert("Ministro salvo!");
-
 });
 
 };
@@ -63,7 +53,7 @@ alert("Ministro salvo!");
 function carregarMinistros(){
 
 let lista = document.getElementById("listaMinistros");
-lista.innerHTML = "";
+lista.innerHTML="";
 
 db.collection("ministros").get().then(snapshot=>{
 
@@ -102,19 +92,17 @@ Excluir
 
 }
 
-window.editarMinistro = function(id,nomeAtual,foneAtual){
+window.editarMinistro = function(id,n,f){
 
-let novoNome = prompt("Nome:", nomeAtual);
-if(!novoNome) return;
+let nome = prompt("Nome:",n);
+if(!nome) return;
 
-let novoFone = prompt("Telefone:", foneAtual);
+let fone = prompt("Telefone:",f);
 
 db.collection("ministros").doc(id).update({
-nome:novoNome,
-fone:novoFone
-}).then(()=>{
-carregarMinistros();
-});
+nome:nome,
+fone:fone
+}).then(carregarMinistros);
 
 };
 
@@ -178,27 +166,15 @@ window.salvarEscala = function(){
 let data = document.getElementById("dataEscala").value;
 let hora = document.getElementById("horaEscala").value;
 
-if(!data || !hora){
-alert("Preencha data e hora.");
-return;
-}
-
-if(ministrosSelecionados.length===0){
-alert("Selecione ministros.");
-return;
-}
+if(!data || !hora) return alert("Preencha data e hora.");
 
 db.collection("escalas").add({
 data:data,
 hora:hora,
 ministros:ministrosSelecionados
 }).then(()=>{
-
 listarEscalas();
 atualizarCalendario();
-
-alert("Escala salva!");
-
 });
 
 };
@@ -216,34 +192,9 @@ snapshot.forEach(doc=>{
 let e = doc.data();
 
 lista.innerHTML += `
-<div class="card" style="padding:14px;margin-bottom:10px">
-
-<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
-
-<div>
-<strong>${formatarDataCompleta(e.data)}</strong> - ${e.hora}
-</div>
-
-<div class="botoes-linha">
-
-<button class="btn-edit"
-onclick="editarEscala('${doc.id}','${e.data}','${e.hora}')">
-Editar
-</button>
-
-<button class="btn-delete"
-onclick="deletarEscala('${doc.id}')">
-Excluir
-</button>
-
-</div>
-
-</div>
-
-<div style="margin-top:10px;color:#555">
+<div class="card" style="padding:12px;margin-bottom:10px">
+<strong>${formatarDataCompleta(e.data)}</strong> - ${e.hora}<br>
 ${e.ministros.join(", ")}
-</div>
-
 </div>
 `;
 
@@ -257,7 +208,8 @@ window.deletarEscala = function(id){
 
 if(!confirm("Excluir escala?")) return;
 
-db.collection("escalas").doc(id).delete().then(()=>{
+db.collection("escalas").doc(id).delete()
+.then(()=>{
 listarEscalas();
 atualizarCalendario();
 });
@@ -296,13 +248,11 @@ eventDisplay:"list-item",
 
 eventClick:function(info){
 
-let ministros =
-info.event.extendedProps.ministros || [];
-
 alert(
 "Data: " + formatarDataCompleta(info.event.startStr) +
 "\nHora: " + info.event.title +
-"\nMinistros: " + ministros.join(", ")
+"\nMinistros: " +
+(info.event.extendedProps.ministros || []).join(", ")
 );
 
 },
@@ -355,7 +305,7 @@ t.innerText.slice(1);
 }
 
 /* =========================================
-PDF COM LOGO
+PDF RESUMIDO EM 1 FOLHA
 ========================================= */
 window.gerarPDF = function(){
 
@@ -365,59 +315,66 @@ db.collection("escalas").orderBy("data").get()
 const { jsPDF } = window.jspdf;
 const doc = new jsPDF();
 
-let y = 20;
+let y = 15;
 
-/* carregar logo */
+/* LOGO */
 let img = new Image();
 img.src = "logo.png";
 
 img.onload = function(){
 
-doc.addImage(img,"PNG",15,10,25,25);
+doc.addImage(img,"PNG",10,8,18,18);
 
-doc.setFontSize(18);
-doc.text("Paróquia Santíssima Trindade",50,20);
+doc.setFontSize(15);
+doc.text("Paróquia Santíssima Trindade",35,16);
 
-y = 45;
+y = 32;
+
+/* organizar por data */
+let agrupado = {};
 
 snapshot.forEach(item=>{
 
 let e = item.data();
-let date = new Date(e.data + "T00:00:00");
-let dayOfWeek = date.toLocaleString("pt-BR", { weekday: "long" });
-let day = date.getDate();
-let month = date.toLocaleString("pt-BR", { month: "long" });
-let year = date.getFullYear();
 
-let formattedDate = `${dayOfWeek}, ${day} de ${month} de ${year}`;
+if(!agrupado[e.data]){
+agrupado[e.data] = [];
+}
 
-doc.setFontSize(12);
-doc.text(formattedDate, 15, y);
-y += 10;
+agrupado[e.data].push(e);
 
-e.ministros.forEach((ministro, index) => {
+});
 
-let hourText = `Hora: ${e.hora}`;
-let ministroText = `Ministros: ${ministro}`;
+for(let data in agrupado){
 
-doc.text(hourText, 15, y);
+doc.setFontSize(11);
+doc.setFont(undefined,"bold");
+doc.text(formatarDataCompleta(data),10,y);
 y += 6;
 
-doc.text(ministroText, 15, y);
-y += 10;
+doc.setFont(undefined,"normal");
 
-if(index < e.ministros.length - 1){
-y += 4; // adicionar espaçamento entre ministros
-}
+agrupado[data].forEach(item=>{
+
+doc.text(
+item.hora + "h - Ministros: " +
+item.ministros.join(", "),
+12,
+y
+);
+
+y += 5;
 
 });
 
-if(y > 270){
+y += 5;
+
+if(y > 275){
 doc.addPage();
-y = 20;
+y = 15;
 }
 
-});
+}
 
 doc.save("escala-ministros.pdf");
 
