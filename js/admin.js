@@ -274,13 +274,6 @@ function formatarDataCompleta(dataISO) {
 }
 
 /* =========================================
-INÍCIO
-========================================= */
-window.onload = function() {
-    abrirTela("dashboard");
-};
-
-/* =========================================
 MÁSCARA TELEFONE
 ========================================= */
 function mascaraTelefone(input) {
