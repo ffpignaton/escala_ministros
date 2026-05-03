@@ -11,7 +11,7 @@ let calendarAdmin = null;
 /* =========================================
 ABRIR TELAS
 ========================================= */
-window.abrirTela = function(id) {
+window.abrirTela = function(id){
     // Esconde todas as telas
     document.querySelectorAll(".tela").forEach(sec => {
         sec.classList.add("hidden");
@@ -33,21 +33,17 @@ window.abrirTela = function(id) {
     if(id === "relatorios") {
         // Lógica do relatório
     }
-
-    if(id === "dashboard") {
-        // Lógica do dashboard
-    }
 };
 
 /* =========================================
 MINISTROS
 ========================================= */
-window.salvarMinistro = function() {
+window.salvarMinistro = function(){
     let nome = document.getElementById("nome").value.trim();
     let fone = document.getElementById("fone").value.trim();
     let endereco = document.getElementById("endereco").value.trim();
 
-    if (!nome) {
+    if(!nome){
         alert("Digite o nome.");
         return;
     }
@@ -74,7 +70,7 @@ function carregarMinistros() {
             let m = doc.data();
 
             lista.innerHTML += `
-            <tr onclick="marcarLinha(this)" class="ministro-linha" data-id="${doc.id}">
+            <tr onclick="marcarLinhaMinistro(this)" class="ministro-linha" data-id="${doc.id}">
                 <td style="padding: 8px; border: 1px solid #ddd;">${m.nome}</td>
                 <td style="padding: 8px; border: 1px solid #ddd;">${m.fone || ""}</td>
                 <td style="padding: 8px; border: 1px solid #ddd;">${m.endereco || ""}</td>
@@ -84,18 +80,9 @@ function carregarMinistros() {
     });
 }
 
-function marcarLinha(linha) {
-    // Remove a cor azul das outras linhas
-    let linhas = document.querySelectorAll('.ministro-linha');
-    linhas.forEach(l => l.classList.remove('selecionada'));
-
-    // Marca a linha clicada
-    linha.classList.add('selecionada');
-}
-
 window.deletarMinistrosSelecionados = function() {
     const ministrosSelecionados = document.querySelectorAll('.ministro-linha.selecionada');
-
+    
     if (ministrosSelecionados.length === 0) {
         alert("Selecione pelo menos um ministro para deletar.");
         return;
@@ -118,30 +105,6 @@ window.deletarMinistrosSelecionados = function() {
 /* =========================================
 ESCALAS
 ========================================= */
-function carregarMinistrosEscala() {
-    let box = document.getElementById("seletorMinistros");
-    box.innerHTML = "";
-    ministrosSelecionados = [];
-
-    db.collection("ministros").get().then(snapshot => {
-        snapshot.forEach(doc => {
-            let nome = doc.data().nome;
-            box.innerHTML += `
-            <div class="tag" onclick="toggleMinistro(this,'${nome}')">${nome}</div>
-            `;
-        });
-    });
-}
-
-window.toggleMinistro = function(el, nome) {
-    if (ministrosSelecionados.includes(nome)) {
-        ministrosSelecionados = ministrosSelecionados.filter(x => x !== nome);
-        el.classList.remove("active");
-    } else {
-        ministrosSelecionados.push(nome);
-        el.classList.add("active");
-    }
-};
 
 window.salvarEscala = function() {
     let data = document.getElementById("dataEscala").value;
@@ -169,7 +132,7 @@ window.salvarEscala = function() {
 };
 
 function listarEscalas() {
-    let lista = document.getElementById("listaEscalasCards");
+    let lista = document.getElementById("listaEscalas");
     lista.innerHTML = "";
 
     db.collection("escalas").orderBy("data").get()
@@ -178,87 +141,47 @@ function listarEscalas() {
             let e = doc.data();
 
             lista.innerHTML += `
-            <div class="card" style="padding:14px;margin-bottom:10px">
-                <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
-                    <div>
-                        <strong>${formatarDataCompleta(e.data)}</strong> - ${e.hora}
-                    </div>
-                </div>
-                <div style="margin-top:10px;color:#555">${e.ministros.join(", ")}</div>
-            </div>
+            <tr onclick="marcarLinhaEscala(this)" class="escala-linha" data-id="${doc.id}">
+                <td style="padding: 8px; border: 1px solid #ddd;">${formatarDataCompleta(e.data)}</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">${e.hora}</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">${e.ministros.join(", ")}</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">${e.observacoes || ""}</td>
+            </tr>
             `;
         });
     });
 }
 
-/* =========================================
-CALENDÁRIO
-========================================= */
-function iniciarCalendario() {
-    if (calendarAdmin) {
-        atualizarCalendario();
+function marcarLinhaEscala(linha) {
+    // Remove a cor azul das outras linhas
+    let linhas = document.querySelectorAll('.escala-linha');
+    linhas.forEach(l => l.classList.remove('selecionada'));
+
+    // Marca a linha clicada
+    linha.classList.add('selecionada');
+}
+
+window.deletarEscalasSelecionadas = function() {
+    const escalasSelecionadas = document.querySelectorAll('.escala-linha.selecionada');
+
+    if (escalasSelecionadas.length === 0) {
+        alert("Selecione pelo menos uma escala para deletar.");
         return;
     }
 
-    calendarAdmin = new FullCalendar.Calendar(
-        document.getElementById("calendarAdmin"), {
-        initialView: "dayGridMonth",
-        locale: "pt-br",
-        height: "auto",
-        contentHeight: "auto",
-        headerToolbar: {
-            left: "prev,next today",
-            center: "title",
-            right: ""
-        },
-        buttonText: {
-            today: "Hoje"
-        },
-        eventDisplay: "list-item",
-        eventClick: function(info) {
-            alert(
-                "Data: " + formatarDataCompleta(info.event.startStr) +
-                "\nHora: " + info.event.title +
-                "\nMinistros: " +
-                (info.event.extendedProps.ministros || []).join(", ")
-            );
-        },
-        datesSet: function() {
-            setTimeout(ajustarTituloCalendario, 100);
-        }
-    });
-
-    calendarAdmin.render();
-    ajustarTituloCalendario();
-    atualizarCalendario();
-}
-
-function atualizarCalendario() {
-    if (!calendarAdmin) return;
-
-    calendarAdmin.removeAllEvents();
-
-    db.collection("escalas").get().then(snapshot => {
-        snapshot.forEach(doc => {
-            let e = doc.data();
-
-            calendarAdmin.addEvent({
-                title: e.hora,
-                start: e.data,
-                ministros: e.ministros
+    escalasSelecionadas.forEach(linha => {
+        const id = linha.getAttribute('data-id');
+        db.collection("escalas").doc(id).delete()
+            .then(() => {
+                listarEscalas();
+                alert("Escala(s) deletada(s) com sucesso!");
+            })
+            .catch(err => {
+                console.error("Erro ao deletar escala: ", err);
+                alert("Ocorreu um erro ao tentar deletar a escala.");
             });
-        });
     });
-}
-
-function ajustarTituloCalendario() {
-    let t = document.querySelector(".fc-toolbar-title");
-    if (!t) return;
-
-    t.innerText =
-        t.innerText.charAt(0).toUpperCase() +
-        t.innerText.slice(1);
-}
+};
 
 /* =========================================
 UTIL
@@ -274,16 +197,8 @@ function formatarDataCompleta(dataISO) {
 }
 
 /* =========================================
-MÁSCARA TELEFONE
+INÍCIO
 ========================================= */
-function mascaraTelefone(input) {
-    var telefone = input.value.replace(/\D/g, ''); // Remove caracteres não numéricos
-    if (telefone.length <= 10) {
-        // Se o número for de 10 dígitos, aplica o formato (XX) XXXX-XXXX
-        telefone = telefone.replace(/^(\d{2})(\d{4})(\d{4})$/, "($1) $2-$3");
-    } else {
-        // Se o número for de 11 dígitos, aplica o formato (XX) XXXXX-XXXX
-        telefone = telefone.replace(/^(\d{2})(\d{5})(\d{4})$/, "($1) $2-$3");
-    }
-    input.value = telefone;
-}
+window.onload = function() {
+    abrirTela("dashboard");
+};
