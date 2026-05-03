@@ -12,12 +12,10 @@ let calendarAdmin = null;
 ABRIR TELAS
 ========================================= */
 window.abrirTela = function(id){
-    // Esconde todas as telas
     document.querySelectorAll(".tela").forEach(sec => {
         sec.classList.add("hidden");
     });
 
-    // Exibe a tela específica
     document.getElementById(id).classList.remove("hidden");
 
     if(id === "ministros") {
@@ -70,7 +68,10 @@ function carregarMinistros() {
             let m = doc.data();
 
             lista.innerHTML += `
-            <tr onclick="marcarLinhaMinistro(this)" class="ministro-linha" data-id="${doc.id}">
+            <tr>
+                <td style="padding: 8px; text-align: center;">
+                    <input type="checkbox" class="ministro-checkbox" data-id="${doc.id}" style="margin-right: 10px;">
+                </td>
                 <td style="padding: 8px; border: 1px solid #ddd;">${m.nome}</td>
                 <td style="padding: 8px; border: 1px solid #ddd;">${m.fone || ""}</td>
                 <td style="padding: 8px; border: 1px solid #ddd;">${m.endereco || ""}</td>
@@ -81,15 +82,15 @@ function carregarMinistros() {
 }
 
 window.deletarMinistrosSelecionados = function() {
-    const ministrosSelecionados = document.querySelectorAll('.ministro-linha.selecionada');
+    const checkboxes = document.querySelectorAll('.ministro-checkbox:checked');
     
-    if (ministrosSelecionados.length === 0) {
+    if (checkboxes.length === 0) {
         alert("Selecione pelo menos um ministro para deletar.");
         return;
     }
 
-    ministrosSelecionados.forEach(linha => {
-        const id = linha.getAttribute('data-id');
+    checkboxes.forEach(checkbox => {
+        const id = checkbox.getAttribute('data-id');
         db.collection("ministros").doc(id).delete()
             .then(() => {
                 carregarMinistros();
@@ -105,6 +106,31 @@ window.deletarMinistrosSelecionados = function() {
 /* =========================================
 ESCALAS
 ========================================= */
+
+function carregarMinistrosEscala() {
+    let box = document.getElementById("seletorMinistros");
+    box.innerHTML = "";
+    ministrosSelecionados = [];
+
+    db.collection("ministros").get().then(snapshot => {
+        snapshot.forEach(doc => {
+            let nome = doc.data().nome;
+            box.innerHTML += `
+            <div class="tag" onclick="toggleMinistro(this, '${nome}')">${nome}</div>
+            `;
+        });
+    });
+}
+
+window.toggleMinistro = function(el, nome) {
+    if (ministrosSelecionados.includes(nome)) {
+        ministrosSelecionados = ministrosSelecionados.filter(x => x !== nome);
+        el.classList.remove("active");
+    } else {
+        ministrosSelecionados.push(nome);
+        el.classList.add("active");
+    }
+};
 
 window.salvarEscala = function() {
     let data = document.getElementById("dataEscala").value;
@@ -126,7 +152,6 @@ window.salvarEscala = function() {
         ministros: ministrosSelecionados
     }).then(() => {
         listarEscalas();
-        atualizarCalendario();
         alert("Escala salva!");
     });
 };
@@ -152,24 +177,15 @@ function listarEscalas() {
     });
 }
 
-function marcarLinhaEscala(linha) {
-    // Remove a cor azul das outras linhas
-    let linhas = document.querySelectorAll('.escala-linha');
-    linhas.forEach(l => l.classList.remove('selecionada'));
-
-    // Marca a linha clicada
-    linha.classList.add('selecionada');
-}
-
 window.deletarEscalasSelecionadas = function() {
-    const escalasSelecionadas = document.querySelectorAll('.escala-linha.selecionada');
+    const linhas = document.querySelectorAll('.escala-linha.selected');
 
-    if (escalasSelecionadas.length === 0) {
+    if (linhas.length === 0) {
         alert("Selecione pelo menos uma escala para deletar.");
         return;
     }
 
-    escalasSelecionadas.forEach(linha => {
+    linhas.forEach(linha => {
         const id = linha.getAttribute('data-id');
         db.collection("escalas").doc(id).delete()
             .then(() => {
@@ -186,6 +202,7 @@ window.deletarEscalasSelecionadas = function() {
 /* =========================================
 UTIL
 ========================================= */
+
 function formatarDataCompleta(dataISO) {
     const data = new Date(dataISO + "T00:00:00");
     return data.toLocaleDateString("pt-BR", {
