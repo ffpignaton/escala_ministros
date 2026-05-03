@@ -70,13 +70,13 @@ function carregarMinistros() {
             let m = doc.data();
 
             lista.innerHTML += `
-            <tr>
-                <td style="padding: 8px; text-align: center;">
-                    <button class="btn-excluir" style="display:none;" onclick="deletarMinistro('${doc.id}')">Excluir</button>
-                </td>
+            <tr data-id="${doc.id}" onclick="deletarMinistro('${doc.id}')">
                 <td style="padding: 8px; border: 1px solid #ddd;">${m.nome}</td>
                 <td style="padding: 8px; border: 1px solid #ddd;">${m.fone || ""}</td>
                 <td style="padding: 8px; border: 1px solid #ddd;">${m.endereco || ""}</td>
+                <td style="padding: 8px; text-align: center;">
+                    <button class="btn-excluir">Excluir</button>
+                </td>
             </tr>
             `;
         });
@@ -97,23 +97,6 @@ window.deletarMinistro = function(id) {
             });
     }
 };
-
-window.deletarMinistrosSelecionados = function() {
-    const btnExcluir = document.querySelectorAll('.btn-excluir');
-
-    btnExcluir.forEach(btn => {
-        // Excluir ministro ao clicar
-        btn.style.display = 'inline-block';
-    });
-};
-
-document.getElementById("selecionarTodos").addEventListener("click", function() {
-    // Exibe os botões de excluir
-    const btnExcluir = document.querySelectorAll('.btn-excluir');
-    btnExcluir.forEach(btn => {
-        btn.style.display = 'inline-block';
-    });
-});
 
 /* =========================================
 ESCALAS
