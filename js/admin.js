@@ -72,7 +72,7 @@ function carregarMinistros() {
             lista.innerHTML += `
             <tr onclick="toggleSelecaoLinha(this)" data-id="${doc.id}">
                 <td style="padding: 8px; text-align: center;">
-                    <input type="checkbox" class="ministro-checkbox" style="margin-right: 10px;">
+                    <!-- Não estamos mais usando o checkbox -->
                 </td>
                 <td style="padding: 8px; border: 1px solid #ddd;">${m.nome}</td>
                 <td style="padding: 8px; border: 1px solid #ddd;">${m.fone || ""}</td>
