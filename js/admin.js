@@ -88,6 +88,9 @@ window.editarMinistro = function(id, nomeAtual, foneAtual) {
     if (!novoNome) return;
 
     let novoFone = prompt("Telefone:", foneAtual);
+    if (novoFone) {
+        novoFone = formatarTelefone(novoFone);
+    }
 
     db.collection("ministros").doc(id).update({
         nome: novoNome,
@@ -97,12 +100,21 @@ window.editarMinistro = function(id, nomeAtual, foneAtual) {
     });
 };
 
-window.deletarMinistro = function(id) {
-    if (!confirm("Excluir ministro?")) return;
+function formatarTelefone(telefone) {
+    // Remove qualquer caractere não numérico
+    telefone = telefone.replace(/\D/g, "");
 
-    db.collection("ministros").doc(id).delete()
-    .then(carregarMinistros);
-};
+    // Aplica o formato (00) 00000-0000
+    if (telefone.length <= 10) {
+        // Para números de até 10 dígitos (sem o DDD completo)
+        telefone = telefone.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+    } else if (telefone.length <= 11) {
+        // Para números de 11 dígitos
+        telefone = telefone.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+    }
+
+    return telefone;
+}
 
 /* =========================================
 ESCALAS
