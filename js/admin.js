@@ -106,10 +106,8 @@ function formatarTelefone(telefone) {
 
     // Aplica o formato (00) 00000-0000
     if (telefone.length <= 10) {
-        // Para números de até 10 dígitos (sem o DDD completo)
         telefone = telefone.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
     } else if (telefone.length <= 11) {
-        // Para números de 11 dígitos
         telefone = telefone.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
     }
 
@@ -203,13 +201,26 @@ window.editarEscala = function(id, dataAtual, horaAtual) {
     let novaHora = prompt("Nova hora:", horaAtual);
     if (!novaHora) return;
 
-    db.collection("escalas").doc(id).update({
-        data: novaData,
-        hora: novaHora
-    }).then(() => {
-        listarEscalas();
-        atualizarCalendario();
-        alert("Escala atualizada!");
+    // Criação do seletor para ministros (deve ser uma lista)
+    let ministrosSelect = "";
+    db.collection("ministros").get().then(snapshot => {
+        snapshot.forEach(doc => {
+            ministrosSelect += `<option value="${doc.id}">${doc.data().nome}</option>`;
+        });
+
+        let novoMinistro = prompt("Selecione o ministro:", ministrosSelect);
+
+        if (novoMinistro) {
+            db.collection("escalas").doc(id).update({
+                data: novaData,
+                hora: novaHora,
+                ministros: [novoMinistro]  // Atualiza o ministro selecionado
+            }).then(() => {
+                listarEscalas();
+                atualizarCalendario();
+                alert("Escala atualizada!");
+            });
+        }
     });
 };
 
