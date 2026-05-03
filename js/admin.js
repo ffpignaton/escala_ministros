@@ -275,3 +275,18 @@ INÍCIO
 window.onload = function() {
     abrirTela("dashboard");
 };
+
+/* =========================================
+MÁSCARA TELEFONE
+========================================= */
+function mascaraTelefone(input) {
+    var telefone = input.value.replace(/\D/g, ''); // Remove caracteres não numéricos
+    if (telefone.length <= 10) {
+        // Se o número for de 10 dígitos, aplica o formato (XX) XXXX-XXXX
+        telefone = telefone.replace(/^(\d{2})(\d{4})(\d{4})$/, "($1) $2-$3");
+    } else {
+        // Se o número for de 11 dígitos, aplica o formato (XX) XXXXX-XXXX
+        telefone = telefone.replace(/^(\d{2})(\d{5})(\d{4})$/, "($1) $2-$3");
+    }
+    input.value = telefone;
+}
