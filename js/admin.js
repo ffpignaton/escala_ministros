@@ -84,19 +84,42 @@ function carregarMinistros() {
 }
 
 window.editarMinistro = function(id, nomeAtual, foneAtual) {
-    let novoNome = prompt("Nome:", nomeAtual);
-    if (!novoNome) return;
+    // Cria o dropdown com os ministros cadastrados
+    let dropdown = document.createElement("select");
 
-    let novoFone = prompt("Telefone:", foneAtual);
-    if (novoFone) {
-        novoFone = formatarTelefone(novoFone);
-    }
+    // Cria a opção "Escolha um nome" (opcional)
+    let optionEmpty = document.createElement("option");
+    optionEmpty.textContent = "Escolha um nome";
+    dropdown.appendChild(optionEmpty);
 
-    db.collection("ministros").doc(id).update({
-        nome: novoNome,
-        fone: novoFone
-    }).then(() => {
-        carregarMinistros();
+    // Preenche o dropdown com os ministros já cadastrados
+    db.collection("ministros").get().then(snapshot => {
+        snapshot.forEach(doc => {
+            let nome = doc.data().nome;
+            let option = document.createElement("option");
+            option.value = nome;
+            option.textContent = nome;
+            dropdown.appendChild(option);
+        });
+
+        // Seleciona o nome atual do ministro
+        dropdown.value = nomeAtual;
+
+        // Exibe o dropdown em vez do prompt
+        let novoNome = dropdown.value;
+        if (!novoNome || novoNome === "Escolha um nome") return;
+
+        let novoFone = prompt("Telefone:", foneAtual);
+        if (novoFone) {
+            novoFone = formatarTelefone(novoFone);
+        }
+
+        db.collection("ministros").doc(id).update({
+            nome: novoNome,
+            fone: novoFone
+        }).then(() => {
+            carregarMinistros();
+        });
     });
 };
 
