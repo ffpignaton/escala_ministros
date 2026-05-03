@@ -70,31 +70,53 @@ function carregarMinistros() {
             let m = doc.data();
 
             lista.innerHTML += `
-            <tr data-id="${doc.id}" onclick="deletarMinistro('${doc.id}')">
+            <tr data-id="${doc.id}" onclick="gerenciarMinistro('${doc.id}')">
                 <td style="padding: 8px; border: 1px solid #ddd;">${m.nome}</td>
                 <td style="padding: 8px; border: 1px solid #ddd;">${m.fone || ""}</td>
                 <td style="padding: 8px; border: 1px solid #ddd;">${m.endereco || ""}</td>
-                <td style="padding: 8px; text-align: center;">
-                    <button class="btn-excluir">Excluir</button>
-                </td>
             </tr>
             `;
         });
     });
 }
 
-window.deletarMinistro = function(id) {
-    if (confirm("Você tem certeza que deseja excluir este ministro?")) {
-        // Lógica para excluir o ministro com o ID fornecido
-        db.collection("ministros").doc(id).delete()
-            .then(() => {
+window.gerenciarMinistro = function(id) {
+    let acao = prompt("Deseja editar ou excluir este ministro? (Digite 'editar' ou 'excluir')").toLowerCase();
+
+    if (acao === 'excluir') {
+        if (confirm("Você tem certeza que deseja excluir este ministro?")) {
+            db.collection("ministros").doc(id).delete()
+                .then(() => {
+                    carregarMinistros();
+                    alert("Ministro excluído com sucesso!");
+                })
+                .catch(err => {
+                    console.error("Erro ao deletar ministro: ", err);
+                    alert("Ocorreu um erro ao tentar deletar o ministro.");
+                });
+        }
+    } else if (acao === 'editar') {
+        let novoNome = prompt("Novo Nome:");
+        let novoFone = prompt("Novo Telefone:");
+        let novoEndereco = prompt("Novo Endereço:");
+
+        if (novoNome && novoFone && novoEndereco) {
+            db.collection("ministros").doc(id).update({
+                nome: novoNome,
+                fone: novoFone,
+                endereco: novoEndereco
+            }).then(() => {
                 carregarMinistros();
-                alert("Ministro excluído com sucesso!");
-            })
-            .catch(err => {
-                console.error("Erro ao deletar ministro: ", err);
-                alert("Ocorreu um erro ao tentar deletar o ministro.");
+                alert("Ministro editado com sucesso!");
+            }).catch(err => {
+                console.error("Erro ao editar ministro: ", err);
+                alert("Ocorreu um erro ao tentar editar o ministro.");
             });
+        } else {
+            alert("Por favor, preencha todos os campos.");
+        }
+    } else {
+        alert("Ação inválida! Digite 'editar' ou 'excluir'.");
     }
 };
 
