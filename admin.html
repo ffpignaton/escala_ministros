@@ -42,44 +42,41 @@
 
 <!-- MINISTROS -->
 <section id="ministros" class="tela hidden">
+    <div class="card">
+        <h2>Cadastro de Ministros</h2>
 
-<div class="card">
-<h2>Cadastro de Ministros</h2>
+        <input id="nome" placeholder="Nome do ministro">
+        <input id="fone" placeholder="(00) 00000-0000" oninput="mascaraTelefone(this)">
+        <input id="endereco" placeholder="Endereço do ministro">
 
-<input id="nome" placeholder="Nome do ministro">
-<input id="fone" placeholder="(00) 00000-0000" oninput="mascaraTelefone(this)">
-<input id="endereco" placeholder="Endereço do ministro">
+        <button onclick="salvarMinistro()">Salvar Ministro</button>
+    </div>
 
-<button onclick="salvarMinistro()">Salvar Ministro</button>
-</div>
-
-<div class="card">
-<h2>Lista de Ministros</h2>
-
-<table id="tabelaMinistros" style="width: 100%; border-collapse: collapse; border: 1px solid #ddd;">
-  <thead>
-    <tr>
-      <th style="padding: 8px; border: 1px solid #ddd;">Nome</th>
-      <th style="padding: 8px; border: 1px solid #ddd;">Telefone</th>
-      <th style="padding: 8px; border: 1px solid #ddd;">Endereço</th>
-    </tr>
-  </thead>
-  <tbody id="listaMinistros">
-    <!-- Os ministros serão listados aqui -->
-  </tbody>
-</table>
-</div>
-
+    <div class="card">
+        <h2>Lista de Ministros</h2>
+        <table id="tabelaMinistros" style="width: 100%; border-collapse: collapse; border: 1px solid #ddd;">
+            <thead>
+                <tr>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Nome</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Telefone</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Endereço</th>
+                </tr>
+            </thead>
+            <tbody id="listaMinistros">
+                <!-- Os ministros serão listados aqui -->
+            </tbody>
+        </table>
+    </div>
 </section>
 
 <!-- ESCALAS -->
 <section id="escalas" class="tela hidden">
-    <!-- Adicione o conteúdo de Escalas aqui -->
+    <!-- Conteúdo da seção de escalas -->
 </section>
 
 <!-- RELATÓRIOS -->
 <section id="relatorios" class="tela hidden">
-    <!-- Adicione o conteúdo de Relatórios aqui -->
+    <!-- Conteúdo da seção de relatórios -->
 </section>
 
 </div>
