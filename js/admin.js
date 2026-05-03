@@ -1,4 +1,4 @@
-alert("BEM VINDO AO PAINEL ADMINISTRATIVO");
+alert("BEM VINDO AO PAINEL");
 
 /* =========================================
 VARIÁVEIS GLOBAIS
