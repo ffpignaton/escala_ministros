@@ -41,7 +41,6 @@ MINISTROS
 window.salvarMinistro = function(){
     let nome = document.getElementById("nome").value.trim();
     let fone = document.getElementById("fone").value.trim();
-    let email = document.getElementById("email").value.trim();
     let endereco = document.getElementById("endereco").value.trim();
 
     if(!nome){
@@ -52,12 +51,10 @@ window.salvarMinistro = function(){
     db.collection("ministros").add({
         nome: nome,
         fone: fone,
-        email: email,
         endereco: endereco
     }).then(() => {
         document.getElementById("nome").value = "";
         document.getElementById("fone").value = "";
-        document.getElementById("email").value = "";
         document.getElementById("endereco").value = "";
         carregarMinistros();
         alert("Ministro salvo!");
@@ -79,7 +76,6 @@ function carregarMinistros() {
                 </td>
                 <td style="padding: 8px; border: 1px solid #ddd;">${m.nome}</td>
                 <td style="padding: 8px; border: 1px solid #ddd;">${m.fone || ""}</td>
-                <td style="padding: 8px; border: 1px solid #ddd;">${m.email || ""}</td>
                 <td style="padding: 8px; border: 1px solid #ddd;">${m.endereco || ""}</td>
             </tr>
             `;
