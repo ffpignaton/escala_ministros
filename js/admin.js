@@ -84,11 +84,6 @@ function carregarMinistros() {
 }
 
 window.editarMinistro = function(id, nomeAtual, foneAtual) {
-    // Abre o modal de edição
-    abrirModalEditarMinistro(id, nomeAtual, foneAtual);
-};
-
-function abrirModalEditarMinistro(id, nomeAtual, foneAtual) {
     // Preenche o modal com os dados atuais
     document.getElementById('editNome').value = nomeAtual;
     document.getElementById('editFone').value = foneAtual;
@@ -133,16 +128,6 @@ window.deletarMinistro = function(id) {
         alert("Ministro excluído!");
     });
 };
-
-function formatarTelefone(telefone) {
-    telefone = telefone.replace(/\D/g, "");
-    if (telefone.length <= 10) {
-        telefone = telefone.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
-    } else if (telefone.length <= 11) {
-        telefone = telefone.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
-    }
-    return telefone;
-}
 
 /* =========================================
 ESCALAS
@@ -234,21 +219,15 @@ window.deletarEscala = function(id) {
 };
 
 window.editarEscala = function(id, dataAtual, horaAtual) {
-    // Abre o modal de edição da escala
-    abrirModalEditarEscala(id, dataAtual, horaAtual);
-};
-
-function abrirModalEditarEscala(id, dataAtual, horaAtual) {
-    // Preenche o modal com os dados atuais da escala
+    // Preenche o modal com os dados atuais
     document.getElementById('editData').value = dataAtual;
     document.getElementById('editHora').value = horaAtual;
 
-    // Carregar o select de ministros para a edição da escala
-    carregarSelectMinistrosEscala(id).then(() => {
-        // Exibe o modal
-        document.getElementById('modalEditar').style.display = 'flex';
+    // Exibe o modal
+    document.getElementById('modalEditar').style.display = 'flex';
 
-        // Salva a edição ao clicar em "Salvar"
+    // Carrega o seletor de ministros e configura o evento para o "Salvar"
+    carregarSelectMinistrosEscala(id).then(() => {
         document.getElementById('btnSalvarEdicao').onclick = function() {
             salvarEdicaoEscala(id);
         };
@@ -258,7 +237,7 @@ function abrirModalEditarEscala(id, dataAtual, horaAtual) {
 function carregarSelectMinistrosEscala(id) {
     return new Promise((resolve, reject) => {
         let ministrosSelect = document.getElementById('ministrosSelect');
-        ministrosSelect.innerHTML = ''; // Limpar opções
+        ministrosSelect.innerHTML = ''; // Limpa as opções
 
         db.collection("ministros").get().then(snapshot => {
             snapshot.forEach(doc => {
