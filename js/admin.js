@@ -69,8 +69,8 @@ function carregarMinistros() {
             lista.innerHTML += `
             <div class="card" style="padding:12px;margin-bottom:10px">
                 <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
-                    <div>
-                        <input type="checkbox" class="ministro-checkbox" data-id="${doc.id}">
+                    <div style="display: flex; align-items: center;">
+                        <input type="checkbox" class="ministro-checkbox" data-id="${doc.id}" style="margin-right: 10px;">
                         <strong>${m.nome}</strong> - ${m.fone || ""}
                     </div>
                 </div>
