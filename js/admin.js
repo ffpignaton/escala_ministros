@@ -195,32 +195,44 @@ function listarEscalas() {
 }
 
 window.editarEscala = function(id, dataAtual, horaAtual) {
-    let novaData = prompt("Nova data:", dataAtual);
-    if (!novaData) return;
+    // Mostrar os ministros em um dropdown
+    let ministrosSelect = document.getElementById('ministrosSelect');
+    ministrosSelect.innerHTML = '';
 
-    let novaHora = prompt("Nova hora:", horaAtual);
-    if (!novaHora) return;
-
-    // Criação do seletor para ministros (deve ser uma lista)
-    let ministrosSelect = "";
     db.collection("ministros").get().then(snapshot => {
         snapshot.forEach(doc => {
-            ministrosSelect += `<option value="${doc.id}">${doc.data().nome}</option>`;
+            ministrosSelect.innerHTML += `<option value="${doc.id}">${doc.data().nome}</option>`;
         });
 
-        let novoMinistro = prompt("Selecione o ministro:", ministrosSelect);
+        // Preencher os campos de edição com os valores atuais
+        document.getElementById('editData').value = dataAtual;
+        document.getElementById('editHora').value = horaAtual;
 
-        if (novoMinistro) {
+        // Mostrar o modal de edição
+        document.getElementById('modalEditar').style.display = 'flex';
+
+        // Ao clicar em salvar, atualize a escala
+        document.getElementById('btnSalvarEdicao').onclick = function() {
+            let novoMinistro = ministrosSelect.value;
+            let novaData = document.getElementById('editData').value;
+            let novaHora = document.getElementById('editHora').value;
+
+            if (!novoMinistro || !novaData || !novaHora) {
+                alert('Preencha todos os campos!');
+                return;
+            }
+
             db.collection("escalas").doc(id).update({
                 data: novaData,
                 hora: novaHora,
-                ministros: [novoMinistro]  // Atualiza o ministro selecionado
+                ministros: [novoMinistro]
             }).then(() => {
                 listarEscalas();
                 atualizarCalendario();
+                document.getElementById('modalEditar').style.display = 'none';
                 alert("Escala atualizada!");
             });
-        }
+        };
     });
 };
 
@@ -301,71 +313,6 @@ function ajustarTituloCalendario() {
         t.innerText.charAt(0).toUpperCase() +
         t.innerText.slice(1);
 }
-
-/* =========================================
-PDF COM LOGO
-========================================= */
-window.gerarPDF = function() {
-    db.collection("escalas").orderBy("data").get()
-    .then(snapshot => {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-
-        let y = 35;
-
-        /* Carregar logo */
-        let img = new Image();
-        img.src = "logo.png";
-
-        img.onload = function() {
-            doc.addImage(img, "PNG", 10, 10, 18, 18);
-            doc.setFontSize(18);
-            doc.text("Paróquia Santíssima Trindade - Matriz São Jorge", 30, 20); // Alinha título à direita do logo
-            doc.setFontSize(10)
-            doc.text("Escala Ministros Extraordinários da Distribuição da Sagrada Comunhão", 30, 25);
-            y = 35;
-
-            let agrupado = {};
-
-            snapshot.forEach(item => {
-                let e = item.data();
-                if (!agrupado[e.data]) {
-                    agrupado[e.data] = [];
-                }
-
-                agrupado[e.data].push(e);
-            });
-
-            // Exibe cada data e suas escalas
-            for (let data in agrupado) {
-                doc.setFontSize(8);
-                doc.setFont(undefined, "bold");
-                doc.text(formatarDataCompleta(data), 10, y);
-                y += 4;
-
-                doc.setFont(undefined, "normal");
-
-                agrupado[data].forEach(item => {
-                    doc.text(
-                        item.hora + "h - Ministros: " + item.ministros.join(", "),
-                        10,
-                        y
-                    );
-                    y += 4;
-                });
-
-                y += 2;
-
-                if (y > 275) {
-                    doc.addPage();
-                    y = 20;
-                }
-            }
-
-            doc.save("escala-ministros.pdf");
-        };
-    });
-};
 
 /* =========================================
 UTIL
