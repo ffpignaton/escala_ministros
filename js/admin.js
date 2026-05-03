@@ -67,14 +67,11 @@ function carregarMinistros() {
             let m = doc.data();
 
             lista.innerHTML += `
-            <div class="card" style="padding:12px;margin-bottom:10px">
-                <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <input type="checkbox" class="ministro-checkbox" data-id="${doc.id}" style="margin-right: 10px;">
-                        <strong>${m.nome}</strong> - ${m.fone || ""}
-                    </div>
-                </div>
-            </div>
+            <tr>
+                <td style="padding: 8px; text-align: center;"><input type="checkbox" class="ministro-checkbox" data-id="${doc.id}" style="margin-right: 10px;"></td>
+                <td style="padding: 8px; border: 1px solid #ddd;">${m.nome}</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">${m.fone || ""}</td>
+            </tr>
             `;
         });
     });
