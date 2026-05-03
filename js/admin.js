@@ -84,37 +84,62 @@ function carregarMinistros() {
 }
 
 window.editarMinistro = function(id, nomeAtual, foneAtual) {
-    // Carregar os ministros para o select no modal
-    carregarSelectMinistros().then(() => {
-        let novoNome = prompt("Nome:", nomeAtual);
-        if (!novoNome) return;
-
-        let novoFone = prompt("Telefone:", foneAtual);
-        if (novoFone) {
-            novoFone = formatarTelefone(novoFone);
-        }
-
-        db.collection("ministros").doc(id).update({
-            nome: novoNome,
-            fone: novoFone
-        }).then(() => {
-            carregarMinistros();
-        });
-    });
+    // Abre o modal de edição
+    abrirModalEditarMinistro(id, nomeAtual, foneAtual);
 };
 
-function carregarSelectMinistros() {
+function abrirModalEditarMinistro(id, nomeAtual, foneAtual) {
+    // Preenche o modal com os dados atuais
+    document.getElementById('editNome').value = nomeAtual;
+    document.getElementById('editFone').value = foneAtual;
+
+    // Carregar o select de ministros para o modal
+    carregarSelectMinistros(id).then(() => {
+        // Exibe o modal
+        document.getElementById('modalEditar').style.display = 'flex';
+        // Salva a edição ao clicar em "Salvar"
+        document.getElementById('btnSalvarEdicao').onclick = function() {
+            salvarEdicaoMinistro(id);
+        };
+    });
+}
+
+function carregarSelectMinistros(id) {
     return new Promise((resolve, reject) => {
         let ministrosSelect = document.getElementById('ministrosSelect');
         ministrosSelect.innerHTML = ''; // Limpar opções
 
         db.collection("ministros").get().then(snapshot => {
             snapshot.forEach(doc => {
-                ministrosSelect.innerHTML += `<option value="${doc.id}">${doc.data().nome}</option>`;
+                ministrosSelect.innerHTML += `<option value="${doc.id}" ${doc.id === id ? 'selected' : ''}>${doc.data().nome}</option>`;
             });
             resolve();
         }).catch(err => reject(err));
     });
+}
+
+function salvarEdicaoMinistro(id) {
+    let nome = document.getElementById('editNome').value;
+    let fone = document.getElementById('editFone').value;
+    let ministroId = document.getElementById('ministrosSelect').value; // Ministro selecionado
+
+    if (!nome || !fone || !ministroId) {
+        alert("Todos os campos devem ser preenchidos.");
+        return;
+    }
+
+    db.collection("ministros").doc(id).update({
+        nome: nome,
+        fone: fone
+    }).then(() => {
+        carregarMinistros();
+        fecharModalEditar();
+        alert("Ministro atualizado!");
+    });
+}
+
+function fecharModalEditar() {
+    document.getElementById('modalEditar').style.display = 'none';
 }
 
 function formatarTelefone(telefone) {
