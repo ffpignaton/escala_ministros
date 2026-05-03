@@ -70,9 +70,9 @@ function carregarMinistros() {
             let m = doc.data();
 
             lista.innerHTML += `
-            <tr>
+            <tr onclick="toggleSelecaoLinha(this)" data-id="${doc.id}">
                 <td style="padding: 8px; text-align: center;">
-                    <input type="checkbox" class="ministro-checkbox" data-id="${doc.id}" style="margin-right: 10px;">
+                    <input type="checkbox" class="ministro-checkbox" style="margin-right: 10px;">
                 </td>
                 <td style="padding: 8px; border: 1px solid #ddd;">${m.nome}</td>
                 <td style="padding: 8px; border: 1px solid #ddd;">${m.fone || ""}</td>
@@ -83,16 +83,24 @@ function carregarMinistros() {
     });
 }
 
+function toggleSelecaoLinha(linha) {
+    linha.classList.toggle('selecionada');
+    const id = linha.getAttribute('data-id');
+
+    if (linha.classList.contains('selecionada')) {
+        ministrosSelecionados.push(id);
+    } else {
+        ministrosSelecionados = ministrosSelecionados.filter(item => item !== id);
+    }
+}
+
 window.deletarMinistrosSelecionados = function() {
-    const checkboxes = document.querySelectorAll('.ministro-checkbox:checked');
-    
-    if (checkboxes.length === 0) {
+    if (ministrosSelecionados.length === 0) {
         alert("Selecione pelo menos um ministro para deletar.");
         return;
     }
 
-    checkboxes.forEach(checkbox => {
-        const id = checkbox.getAttribute('data-id');
+    ministrosSelecionados.forEach(id => {
         db.collection("ministros").doc(id).delete()
             .then(() => {
                 carregarMinistros();
@@ -103,6 +111,8 @@ window.deletarMinistrosSelecionados = function() {
                 alert("Ocorreu um erro ao tentar deletar o ministro.");
             });
     });
+
+    ministrosSelecionados = [];
 };
 
 /* =========================================
