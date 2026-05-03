@@ -68,10 +68,7 @@ function carregarMinistros() {
             let m = doc.data();
 
             lista.innerHTML += `
-            <tr>
-                <td style="padding: 8px; text-align: center;">
-                    <input type="checkbox" class="ministro-checkbox" data-id="${doc.id}" style="margin-right: 10px;">
-                </td>
+            <tr onclick="marcarLinhaMinistro(this)" class="linha-ministro" data-id="${doc.id}">
                 <td style="padding: 8px; border: 1px solid #ddd;">${m.nome}</td>
                 <td style="padding: 8px; border: 1px solid #ddd;">${m.fone || ""}</td>
                 <td style="padding: 8px; border: 1px solid #ddd;">${m.endereco || ""}</td>
@@ -82,15 +79,15 @@ function carregarMinistros() {
 }
 
 window.deletarMinistrosSelecionados = function() {
-    const checkboxes = document.querySelectorAll('.ministro-checkbox:checked');
-    
-    if (checkboxes.length === 0) {
+    const linhas = document.querySelectorAll('.linha-ministro.selected');
+
+    if (linhas.length === 0) {
         alert("Selecione pelo menos um ministro para deletar.");
         return;
     }
 
-    checkboxes.forEach(checkbox => {
-        const id = checkbox.getAttribute('data-id');
+    linhas.forEach(linha => {
+        const id = linha.getAttribute('data-id');
         db.collection("ministros").doc(id).delete()
             .then(() => {
                 carregarMinistros();
