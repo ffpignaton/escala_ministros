@@ -95,6 +95,11 @@ window.editarMinistro = function(id, nomeAtual, foneAtual) {
     document.getElementById('btnSalvarEdicao').onclick = function() {
         salvarEdicaoMinistro(id);
     };
+
+    // Fecha o modal ao clicar em "Cancelar"
+    document.getElementById('btnCancelarEdicao').onclick = function() {
+        fecharModalEditar();
+    };
 }
 
 function salvarEdicaoMinistro(id) {
@@ -230,6 +235,11 @@ window.editarEscala = function(id, dataAtual, horaAtual) {
     carregarSelectMinistrosEscala(id).then(() => {
         document.getElementById('btnSalvarEdicao').onclick = function() {
             salvarEdicaoEscala(id);
+        };
+
+        // Fechar modal ao clicar em "Cancelar"
+        document.getElementById('btnCancelarEdicao').onclick = function() {
+            fecharModalEditar();
         };
     });
 }
