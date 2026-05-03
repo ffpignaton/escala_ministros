@@ -65,8 +65,6 @@
 placeholder="(00) 00000-0000"
 oninput="mascaraTelefone(this)">
 
-<input id="email" placeholder="E-mail do ministro">
-
 <input id="endereco" placeholder="Endereço do ministro">
 
 <button onclick="salvarMinistro()">Salvar Ministro</button>
@@ -75,14 +73,13 @@ oninput="mascaraTelefone(this)">
 
 <div class="card">
 <h2>Lista de Ministros</h2>
-<!-- Tabela com nome, telefone, email, endereço e checkbox -->
+<!-- Tabela com nome, telefone, endereço e checkbox -->
 <table id="tabelaMinistros" style="width: 100%; border-collapse: collapse;">
   <thead>
     <tr>
       <th style="padding: 8px; border: 1px solid #ddd;">Selecionar</th>
       <th style="padding: 8px; border: 1px solid #ddd;">Nome</th>
       <th style="padding: 8px; border: 1px solid #ddd;">Telefone</th>
-      <th style="padding: 8px; border: 1px solid #ddd;">E-mail</th>
       <th style="padding: 8px; border: 1px solid #ddd;">Endereço</th>
     </tr>
   </thead>
