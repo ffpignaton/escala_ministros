@@ -135,16 +135,12 @@ window.deletarMinistro = function(id) {
 };
 
 function formatarTelefone(telefone) {
-    // Remove qualquer caractere não numérico
     telefone = telefone.replace(/\D/g, "");
-
-    // Aplica o formato (00) 00000-0000
     if (telefone.length <= 10) {
         telefone = telefone.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
     } else if (telefone.length <= 11) {
         telefone = telefone.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
     }
-
     return telefone;
 }
 
