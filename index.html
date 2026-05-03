@@ -1,50 +1,82 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Escala dos Ministros</title>
-
-<link rel="stylesheet" href="css/calendar.css">
-
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
-<script src="js/firebase.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="js/firebase.js"></script>
 </head>
-
 <body>
+    <div class="dashboard">
+        <!-- MENU -->
+        <div class="sidebar">
+            <h2>⛪ Escalas</h2>
+            <div class="menu-item" onclick="abrirTela('dashboard')">🏠 Dashboard</div>
+            <div class="menu-item" onclick="abrirTela('ministros')">👥 Ministros</div>
+            <div class="menu-item" onclick="abrirTela('escalas')">📅 Escalas</div>
+            <div class="menu-item" onclick="abrirTela('relatorios')">📄 Relatórios</div>
+        </div>
 
-<header>
-<h1>Paróquia Santíssima Trindade</h1>
-<h2>Matriz São Jorge</h2>
-</header>
+        <!-- CONTEÚDO -->
+        <div class="main">
+            <!-- MINISTROS -->
+            <section id="ministros" class="tela hidden">
+                <div class="card">
+                    <h2>Cadastro de Ministros</h2>
+                    <input id="nome" placeholder="Nome do ministro">
+                    <input id="fone" placeholder="(00) 00000-0000" oninput="mascaraTelefone(this)">
+                    <input id="endereco" placeholder="Endereço do ministro">
+                    <button onclick="salvarMinistro()">Salvar Ministro</button>
+                </div>
 
-<section class="calendar-box">
+                <div class="card">
+                    <h2>Lista de Ministros</h2>
+                    <table id="tabelaMinistros" style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr>
+                                <th style="padding: 8px; border: 1px solid #ddd;">Selecione</th>
+                                <th style="padding: 8px; border: 1px solid #ddd;">Nome</th>
+                                <th style="padding: 8px; border: 1px solid #ddd;">Telefone</th>
+                                <th style="padding: 8px; border: 1px solid #ddd;">Endereço</th>
+                            </tr>
+                        </thead>
+                        <tbody id="listaMinistros"></tbody>
+                    </table>
+                    <button onclick="deletarMinistrosSelecionados()">Deletar Selecionados</button>
+                </div>
+            </section>
 
-<div class="calendar-top">
-<button onclick="mesAnterior()" class="nav-btn">◀</button>
-<h2 id="mesAno"></h2>
-<button onclick="proximoMes()" class="nav-btn">▶</button>
-</div>
+            <!-- ESCALAS -->
+            <section id="escalas" class="tela hidden">
+                <div class="card">
+                    <h2>Criar Escala</h2>
+                    <input type="date" id="dataEscala">
+                    <input type="time" id="horaEscala">
+                    <button onclick="salvarEscala()">Salvar Escala</button>
+                </div>
 
-<div class="weekdays">
-<div>Dom</div>
-<div>Seg</div>
-<div>Ter</div>
-<div>Qua</div>
-<div>Qui</div>
-<div>Sex</div>
-<div>Sáb</div>
-</div>
+                <div class="card">
+                    <h2>Escalas Criadas</h2>
+                    <table id="tabelaEscalas" style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr>
+                                <th style="padding: 8px; border: 1px solid #ddd;">Selecione</th>
+                                <th style="padding: 8px; border: 1px solid #ddd;">Data</th>
+                                <th style="padding: 8px; border: 1px solid #ddd;">Hora</th>
+                                <th style="padding: 8px; border: 1px solid #ddd;">Ministros</th>
+                            </tr>
+                        </thead>
+                        <tbody id="listaEscalas"></tbody>
+                    </table>
+                    <button onclick="deletarEscalasSelecionadas()">Deletar Selecionados</button>
+                </div>
+            </section>
+        </div>
+    </div>
 
-<div id="calendario" class="calendar-grid"></div>
-
-<div id="detalhesDia" class="agenda-dia"></div>
-
-</section>
-
-<script src="js/calendar.js"></script>
-
+    <script src="js/admin.js"></script>
 </body>
 </html>
