@@ -4,7 +4,9 @@ alert("BEM VINDO AO PAINEL ADMINISTRATIVO");
 VARIÁVEIS GLOBAIS
 ========================================= */
 let ministrosSelecionados = [];
+let ministrosEdicao = [];
 let escalaEditandoId = null;
+let calendarAdmin = null;
 
 /* =========================================
 ABRIR TELAS
@@ -25,6 +27,11 @@ window.abrirTela = function(id){
     if(id === "escalas") {
         carregarMinistrosEscala();
         listarEscalas();
+        iniciarCalendario();
+    }
+
+    if(id === "relatorios") {
+        // Lógica do relatório
     }
 };
 
@@ -65,42 +72,11 @@ function carregarMinistros() {
                     <div>
                         <strong>${m.nome}</strong> - ${m.fone || ""}
                     </div>
-                    <div class="botoes-linha">
-                        <button class="btn-edit" onclick="editarMinistro('${doc.id}','${m.nome}','${m.fone || ""}')">Editar</button>
-                        <button class="btn-delete" onclick="deletarMinistro('${doc.id}')">Excluir</button>
-                    </div>
                 </div>
             </div>
             `;
         });
     });
-}
-
-window.editarMinistro = function(id, nomeAtual, foneAtual) {
-    let novoNome = prompt("Nome:", nomeAtual);
-    if (!novoNome) return;
-
-    let novoFone = prompt("Telefone:", foneAtual);
-    if (novoFone) {
-        novoFone = formatarTelefone(novoFone);
-    }
-
-    db.collection("ministros").doc(id).update({
-        nome: novoNome,
-        fone: novoFone
-    }).then(() => {
-        carregarMinistros();
-    });
-};
-
-function formatarTelefone(telefone) {
-    telefone = telefone.replace(/\D/g, "");
-    if (telefone.length <= 10) {
-        telefone = telefone.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
-    } else if (telefone.length <= 11) {
-        telefone = telefone.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
-    }
-    return telefone;
 }
 
 /* =========================================
@@ -151,6 +127,7 @@ window.salvarEscala = function() {
         ministros: ministrosSelecionados
     }).then(() => {
         listarEscalas();
+        atualizarCalendario();
         alert("Escala salva!");
     });
 };
@@ -170,10 +147,6 @@ function listarEscalas() {
                     <div>
                         <strong>${formatarDataCompleta(e.data)}</strong> - ${e.hora}
                     </div>
-                    <div class="botoes-linha">
-                        <button class="btn-edit" onclick="editarEscala('${doc.id}','${e.data}','${e.hora}',${JSON.stringify(e.ministros)})">Editar</button>
-                        <button class="btn-delete" onclick="deletarEscala('${doc.id}')">Excluir</button>
-                    </div>
                 </div>
                 <div style="margin-top:10px;color:#555">${e.ministros.join(", ")}</div>
             </div>
@@ -182,77 +155,138 @@ function listarEscalas() {
     });
 }
 
-window.deletarEscala = function(id) {
-    if (!confirm("Excluir escala?")) return;
-
-    db.collection("escalas").doc(id).delete().then(() => {
-        listarEscalas();
-    });
-};
-
 /* =========================================
-EDITAR ESCALA
+CALENDÁRIO
 ========================================= */
-window.editarEscala = function(id, dataAtual, horaAtual, ministrosSelecionados) {
-    document.getElementById("modalEditar").style.display = "flex";
-    document.getElementById("editData").value = dataAtual;
-    document.getElementById("editHora").value = horaAtual;
+function iniciarCalendario() {
+    if (calendarAdmin) {
+        atualizarCalendario();
+        return;
+    }
 
-    carregarMinistrosParaEditar(ministrosSelecionados);
-    escalaEditandoId = id;
-};
+    calendarAdmin = new FullCalendar.Calendar(
+        document.getElementById("calendarAdmin"), {
+        initialView: "dayGridMonth",
+        locale: "pt-br",
+        height: "auto",
+        contentHeight: "auto",
+        headerToolbar: {
+            left: "prev,next today",
+            center: "title",
+            right: ""
+        },
+        buttonText: {
+            today: "Hoje"
+        },
+        eventDisplay: "list-item",
+        eventClick: function(info) {
+            alert(
+                "Data: " + formatarDataCompleta(info.event.startStr) +
+                "\nHora: " + info.event.title +
+                "\nMinistros: " +
+                (info.event.extendedProps.ministros || []).join(", ")
+            );
+        },
+        datesSet: function() {
+            setTimeout(ajustarTituloCalendario, 100);
+        }
+    });
 
-function carregarMinistrosParaEditar(ministrosSelecionados) {
-    let box = document.getElementById("editMinistros");
-    box.innerHTML = "";
+    calendarAdmin.render();
+    ajustarTituloCalendario();
+    atualizarCalendario();
+}
 
-    db.collection("ministros").get().then(snapshot => {
+function atualizarCalendario() {
+    if (!calendarAdmin) return;
+
+    calendarAdmin.removeAllEvents();
+
+    db.collection("escalas").get().then(snapshot => {
         snapshot.forEach(doc => {
-            let nome = doc.data().nome;
-            let isSelected = ministrosSelecionados.includes(nome) ? "active" : "";
+            let e = doc.data();
 
-            box.innerHTML += `
-                <div class="tag ${isSelected}" onclick="toggleMinistroEditar(this, '${nome}')">${nome}</div>
-            `;
+            calendarAdmin.addEvent({
+                title: e.hora,
+                start: e.data,
+                ministros: e.ministros
+            });
         });
     });
 }
 
-window.toggleMinistroEditar = function(el, nome) {
-    el.classList.toggle("active");
-};
+function ajustarTituloCalendario() {
+    let t = document.querySelector(".fc-toolbar-title");
+    if (!t) return;
 
-window.salvarEdicao = function() {
-    let data = document.getElementById("editData").value;
-    let hora = document.getElementById("editHora").value;
+    t.innerText =
+        t.innerText.charAt(0).toUpperCase() +
+        t.innerText.slice(1);
+}
 
-    if (!data || !hora) {
-        alert("Preencha data e hora.");
-        return;
-    }
+/* =========================================
+PDF COM LOGO
+========================================= */
+window.gerarPDF = function() {
+    db.collection("escalas").orderBy("data").get()
+    .then(snapshot => {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
 
-    let ministros = [];
-    document.querySelectorAll("#editMinistros .active").forEach(tag => {
-        ministros.push(tag.textContent);
+        let y = 35;
+
+        /* Carregar logo */
+        let img = new Image();
+        img.src = "logo.png";
+
+        img.onload = function() {
+            doc.addImage(img, "PNG", 10, 10, 18, 18);
+            doc.setFontSize(18);
+            doc.text("Paróquia Santíssima Trindade - Matriz São Jorge", 30, 20); // Alinha título à direita do logo
+            doc.setFontSize(10)
+            doc.text("Escala Ministros Extraordinários da Distribuição da Sagrada Comunhão", 30, 25);
+            y = 35;
+
+            let agrupado = {};
+
+            snapshot.forEach(item => {
+                let e = item.data();
+                if (!agrupado[e.data]) {
+                    agrupado[e.data] = [];
+                }
+
+                agrupado[e.data].push(e);
+            });
+
+            // Exibe cada data e suas escalas
+            for (let data in agrupado) {
+                doc.setFontSize(8);
+                doc.setFont(undefined, "bold");
+                doc.text(formatarDataCompleta(data), 10, y);
+                y += 4;
+
+                doc.setFont(undefined, "normal");
+
+                agrupado[data].forEach(item => {
+                    doc.text(
+                        item.hora + "h - Ministros: " + item.ministros.join(", "),
+                        10,
+                        y
+                    );
+                    y += 4;
+                });
+
+                y += 2;
+
+                if (y > 275) {
+                    doc.addPage();
+                    y = 20;
+                }
+            }
+
+            doc.save("escala-ministros.pdf");
+        };
     });
-
-    if (ministros.length === 0) {
-        alert("Selecione ministros.");
-        return;
-    }
-
-    db.collection("escalas").doc(escalaEditandoId).update({
-        data: data,
-        hora: hora,
-        ministros: ministros
-    }).then(() => {
-        listarEscalas();
-        fecharModal();
-    });
-};
-
-window.fecharModal = function() {
-    document.getElementById("modalEditar").style.display = "none";
 };
 
 /* =========================================
