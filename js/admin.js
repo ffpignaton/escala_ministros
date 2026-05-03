@@ -1,4 +1,4 @@
-alert("Paz e Bem");
+alert("BEM VINDO AO PAINEL ADMINISTRATIVO");
 
 /* =========================================
 VARIÁVEIS GLOBAIS
@@ -61,21 +61,6 @@ window.salvarMinistro = function(){
     });
 };
 
-// Função de formatação do telefone
-function mascaraTelefone(input) {
-    let valor = input.value.replace(/\D/g, ''); // Remove tudo o que não é dígito
-
-    if (valor.length <= 10) {
-        // Formato (XX) XXXX-XXXX
-        valor = valor.replace(/^(\d{2})(\d{4})(\d{4})$/, "($1) $2-$3");
-    } else {
-        // Formato (XX) XXXXX-XXXX
-        valor = valor.replace(/^(\d{2})(\d{5})(\d{4})$/, "($1) $2-$3");
-    }
-
-    input.value = valor;
-}
-
 function carregarMinistros() {
     let lista = document.getElementById("listaMinistros");
     lista.innerHTML = "";
@@ -85,7 +70,10 @@ function carregarMinistros() {
             let m = doc.data();
 
             lista.innerHTML += `
-            <tr class="ministro-row" onclick="marcarLinha(this)">
+            <tr>
+                <td style="padding: 8px; text-align: center;">
+                    <input type="checkbox" class="ministro-checkbox" data-id="${doc.id}" style="margin-right: 10px;">
+                </td>
                 <td style="padding: 8px; border: 1px solid #ddd;">${m.nome}</td>
                 <td style="padding: 8px; border: 1px solid #ddd;">${m.fone || ""}</td>
                 <td style="padding: 8px; border: 1px solid #ddd;">${m.endereco || ""}</td>
@@ -95,28 +83,16 @@ function carregarMinistros() {
     });
 }
 
-function marcarLinha(linha) {
-    // Verifica se a linha já está marcada, caso contrário, marca
-    if (linha.classList.contains("selecionada")) {
-        linha.classList.remove("selecionada");
-    } else {
-        // Remove a marcação de outras linhas
-        let linhas = document.querySelectorAll('.ministro-row');
-        linhas.forEach(l => l.classList.remove("selecionada"));
-        linha.classList.add("selecionada");
-    }
-}
-
 window.deletarMinistrosSelecionados = function() {
-    const linhasSelecionadas = document.querySelectorAll('.ministro-row.selecionada');
+    const checkboxes = document.querySelectorAll('.ministro-checkbox:checked');
     
-    if (linhasSelecionadas.length === 0) {
+    if (checkboxes.length === 0) {
         alert("Selecione pelo menos um ministro para deletar.");
         return;
     }
 
-    linhasSelecionadas.forEach(linha => {
-        const id = linha.getAttribute('data-id');
+    checkboxes.forEach(checkbox => {
+        const id = checkbox.getAttribute('data-id');
         db.collection("ministros").doc(id).delete()
             .then(() => {
                 carregarMinistros();
