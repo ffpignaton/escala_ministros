@@ -84,59 +84,36 @@ function carregarMinistros() {
 }
 
 window.editarMinistro = function(id, nomeAtual, foneAtual) {
-    // Cria o dropdown com os ministros cadastrados
-    let dropdown = document.createElement("select");
+    let novoNome = prompt("Nome:", nomeAtual);
+    if (!novoNome) return;
 
-    // Cria a opção "Escolha um nome" (opcional)
-    let optionEmpty = document.createElement("option");
-    optionEmpty.textContent = "Escolha um nome";
-    dropdown.appendChild(optionEmpty);
+    let novoFone = prompt("Telefone:", foneAtual);
+    if (novoFone) {
+        novoFone = formatarTelefone(novoFone);
+    }
 
-    // Preenche o dropdown com os ministros já cadastrados
-    db.collection("ministros").get().then(snapshot => {
-        snapshot.forEach(doc => {
-            let nome = doc.data().nome;
-            let option = document.createElement("option");
-            option.value = nome;
-            option.textContent = nome;
-            dropdown.appendChild(option);
-        });
-
-        // Seleciona o nome atual do ministro
-        dropdown.value = nomeAtual;
-
-        // Exibe o dropdown em vez do prompt
-        let novoNome = dropdown.value;
-        if (!novoNome || novoNome === "Escolha um nome") return;
-
-        let novoFone = prompt("Telefone:", foneAtual);
-        if (novoFone) {
-            novoFone = formatarTelefone(novoFone);
-        }
-
-        db.collection("ministros").doc(id).update({
-            nome: novoNome,
-            fone: novoFone
-        }).then(() => {
-            carregarMinistros();
-        });
-    });
+    db.collection("ministros").doc(id).update({
+        nome: novoNome,
+        fone: novoFone
+    }).then(() => {
+        carregarMinistros();
+    });
 };
 
 function formatarTelefone(telefone) {
-    // Remove qualquer caractere não numérico
-    telefone = telefone.replace(/\D/g, "");
+    // Remove qualquer caractere não numérico
+    telefone = telefone.replace(/\D/g, "");
 
-    // Aplica o formato (00) 00000-0000
-    if (telefone.length <= 10) {
-        // Para números de até 10 dígitos (sem o DDD completo)
-        telefone = telefone.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
-    } else if (telefone.length <= 11) {
-        // Para números de 11 dígitos
-        telefone = telefone.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
-    }
+    // Aplica o formato (00) 00000-0000
+    if (telefone.length <= 10) {
+        // Para números de até 10 dígitos (sem o DDD completo)
+        telefone = telefone.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+    } else if (telefone.length <= 11) {
+        // Para números de 11 dígitos
+        telefone = telefone.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+    }
 
-    return telefone;
+    return telefone;
 }
 
 /* =========================================
