@@ -72,7 +72,7 @@ function carregarMinistros() {
             lista.innerHTML += `
             <tr>
                 <td style="padding: 8px; text-align: center;">
-                    <input type="checkbox" class="ministro-checkbox" data-id="${doc.id}" style="margin-right: 10px;">
+                    <button class="btn-excluir" style="display:none;" onclick="deletarMinistro('${doc.id}')">Excluir</button>
                 </td>
                 <td style="padding: 8px; border: 1px solid #ddd;">${m.nome}</td>
                 <td style="padding: 8px; border: 1px solid #ddd;">${m.fone || ""}</td>
@@ -83,27 +83,37 @@ function carregarMinistros() {
     });
 }
 
-window.deletarMinistrosSelecionados = function() {
-    const checkboxes = document.querySelectorAll('.ministro-checkbox:checked');
-    
-    if (checkboxes.length === 0) {
-        alert("Selecione pelo menos um ministro para deletar.");
-        return;
-    }
-
-    checkboxes.forEach(checkbox => {
-        const id = checkbox.getAttribute('data-id');
+window.deletarMinistro = function(id) {
+    if (confirm("Você tem certeza que deseja excluir este ministro?")) {
+        // Lógica para excluir o ministro com o ID fornecido
         db.collection("ministros").doc(id).delete()
             .then(() => {
                 carregarMinistros();
-                alert("Ministro(s) deletado(s) com sucesso!");
+                alert("Ministro excluído com sucesso!");
             })
             .catch(err => {
                 console.error("Erro ao deletar ministro: ", err);
                 alert("Ocorreu um erro ao tentar deletar o ministro.");
             });
+    }
+};
+
+window.deletarMinistrosSelecionados = function() {
+    const btnExcluir = document.querySelectorAll('.btn-excluir');
+
+    btnExcluir.forEach(btn => {
+        // Excluir ministro ao clicar
+        btn.style.display = 'inline-block';
     });
 };
+
+document.getElementById("selecionarTodos").addEventListener("click", function() {
+    // Exibe os botões de excluir
+    const btnExcluir = document.querySelectorAll('.btn-excluir');
+    btnExcluir.forEach(btn => {
+        btn.style.display = 'inline-block';
+    });
+});
 
 /* =========================================
 ESCALAS
