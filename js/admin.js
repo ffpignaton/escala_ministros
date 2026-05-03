@@ -11,7 +11,7 @@ let calendarAdmin = null;
 /* =========================================
 ABRIR TELAS
 ========================================= */
-window.abrirTela = function(id) {
+window.abrirTela = function(id){
     // Esconde todas as telas
     document.querySelectorAll(".tela").forEach(sec => {
         sec.classList.add("hidden");
@@ -38,11 +38,11 @@ window.abrirTela = function(id) {
 /* =========================================
 MINISTROS
 ========================================= */
-window.salvarMinistro = function() {
+window.salvarMinistro = function(){
     let nome = document.getElementById("nome").value.trim();
     let fone = document.getElementById("fone").value.trim();
 
-    if (!nome) {
+    if(!nome){
         alert("Digite o nome.");
         return;
     }
@@ -179,7 +179,7 @@ function listarEscalas() {
                         <strong>${formatarDataCompleta(e.data)}</strong> - ${e.hora}
                     </div>
                     <div class="botoes-linha">
-                        <button class="btn-edit" onclick="editarEscala('${doc.id}','${e.data}','${e.hora}')">Editar</button>
+                        <button class="btn-edit" onclick="editarEscala('${doc.id}','${e.data}','${e.hora}',${JSON.stringify(e.ministros)})">Editar</button>
                         <button class="btn-delete" onclick="deletarEscala('${doc.id}')">Excluir</button>
                     </div>
                 </div>
@@ -269,6 +269,72 @@ function ajustarTituloCalendario() {
 }
 
 /* =========================================
+EDITAR ESCALA
+========================================= */
+window.editarEscala = function(id, dataAtual, horaAtual, ministrosSelecionados) {
+    document.getElementById("modalEditar").style.display = "flex";
+    document.getElementById("editData").value = dataAtual;
+    document.getElementById("editHora").value = horaAtual;
+
+    carregarMinistrosParaEditar(ministrosSelecionados);
+    escalaEditandoId = id;
+};
+
+function carregarMinistrosParaEditar(ministrosSelecionados) {
+    let box = document.getElementById("editMinistros");
+    box.innerHTML = "";
+
+    db.collection("ministros").get().then(snapshot => {
+        snapshot.forEach(doc => {
+            let nome = doc.data().nome;
+            let isSelected = ministrosSelecionados.includes(nome) ? "active" : "";
+
+            box.innerHTML += `
+                <div class="tag ${isSelected}" onclick="toggleMinistroEditar(this, '${nome}')">${nome}</div>
+            `;
+        });
+    });
+}
+
+window.toggleMinistroEditar = function(el, nome) {
+    el.classList.toggle("active");
+};
+
+window.salvarEdicao = function() {
+    let data = document.getElementById("editData").value;
+    let hora = document.getElementById("editHora").value;
+
+    if (!data || !hora) {
+        alert("Preencha data e hora.");
+        return;
+    }
+
+    let ministros = [];
+    document.querySelectorAll("#editMinistros .active").forEach(tag => {
+        ministros.push(tag.textContent);
+    });
+
+    if (ministros.length === 0) {
+        alert("Selecione ministros.");
+        return;
+    }
+
+    db.collection("escalas").doc(escalaEditandoId).update({
+        data: data,
+        hora: hora,
+        ministros: ministros
+    }).then(() => {
+        listarEscalas();
+        atualizarCalendario();
+        fecharModal();
+    });
+};
+
+window.fecharModal = function() {
+    document.getElementById("modalEditar").style.display = "none";
+};
+
+/* =========================================
 PDF COM LOGO
 ========================================= */
 window.gerarPDF = function() {
@@ -278,15 +344,13 @@ window.gerarPDF = function() {
         const doc = new jsPDF();
 
         let y = 35;
-
-        /* Carregar logo */
         let img = new Image();
         img.src = "logo.png";
 
         img.onload = function() {
             doc.addImage(img, "PNG", 10, 10, 18, 18);
             doc.setFontSize(18);
-            doc.text("Paróquia Santíssima Trindade - Matriz São Jorge", 30, 20); // Alinha título à direita do logo
+            doc.text("Paróquia Santíssima Trindade - Matriz São Jorge", 30, 20);
             doc.setFontSize(10)
             doc.text("Escala Ministros Extraordinários da Distribuição da Sagrada Comunhão", 30, 25);
             y = 35;
@@ -302,7 +366,6 @@ window.gerarPDF = function() {
                 agrupado[e.data].push(e);
             });
 
-            // Exibe cada data e suas escalas
             for (let data in agrupado) {
                 doc.setFontSize(8);
                 doc.setFont(undefined, "bold");
