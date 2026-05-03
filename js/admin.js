@@ -4,9 +4,7 @@ alert("BEM VINDO AO PAINEL ADMINISTRATIVO");
 VARIÁVEIS GLOBAIS
 ========================================= */
 let ministrosSelecionados = [];
-let ministrosEdicao = [];
 let escalaEditandoId = null;
-let calendarAdmin = null;
 
 /* =========================================
 ABRIR TELAS
@@ -27,11 +25,6 @@ window.abrirTela = function(id){
     if(id === "escalas") {
         carregarMinistrosEscala();
         listarEscalas();
-        iniciarCalendario();
-    }
-
-    if(id === "relatorios") {
-        // Lógica do relatório
     }
 };
 
@@ -158,7 +151,6 @@ window.salvarEscala = function() {
         ministros: ministrosSelecionados
     }).then(() => {
         listarEscalas();
-        atualizarCalendario();
         alert("Escala salva!");
     });
 };
@@ -195,78 +187,8 @@ window.deletarEscala = function(id) {
 
     db.collection("escalas").doc(id).delete().then(() => {
         listarEscalas();
-        atualizarCalendario();
     });
 };
-
-/* =========================================
-CALENDÁRIO
-========================================= */
-function iniciarCalendario() {
-    if (calendarAdmin) {
-        atualizarCalendario();
-        return;
-    }
-
-    calendarAdmin = new FullCalendar.Calendar(
-        document.getElementById("calendarAdmin"), {
-        initialView: "dayGridMonth",
-        locale: "pt-br",
-        height: "auto",
-        contentHeight: "auto",
-        headerToolbar: {
-            left: "prev,next today",
-            center: "title",
-            right: ""
-        },
-        buttonText: {
-            today: "Hoje"
-        },
-        eventDisplay: "list-item",
-        eventClick: function(info) {
-            alert(
-                "Data: " + formatarDataCompleta(info.event.startStr) +
-                "\nHora: " + info.event.title +
-                "\nMinistros: " +
-                (info.event.extendedProps.ministros || []).join(", ")
-            );
-        },
-        datesSet: function() {
-            setTimeout(ajustarTituloCalendario, 100);
-        }
-    });
-
-    calendarAdmin.render();
-    ajustarTituloCalendario();
-    atualizarCalendario();
-}
-
-function atualizarCalendario() {
-    if (!calendarAdmin) return;
-
-    calendarAdmin.removeAllEvents();
-
-    db.collection("escalas").get().then(snapshot => {
-        snapshot.forEach(doc => {
-            let e = doc.data();
-
-            calendarAdmin.addEvent({
-                title: e.hora,
-                start: e.data,
-                ministros: e.ministros
-            });
-        });
-    });
-}
-
-function ajustarTituloCalendario() {
-    let t = document.querySelector(".fc-toolbar-title");
-    if (!t) return;
-
-    t.innerText =
-        t.innerText.charAt(0).toUpperCase() +
-        t.innerText.slice(1);
-}
 
 /* =========================================
 EDITAR ESCALA
@@ -325,75 +247,12 @@ window.salvarEdicao = function() {
         ministros: ministros
     }).then(() => {
         listarEscalas();
-        atualizarCalendario();
         fecharModal();
     });
 };
 
 window.fecharModal = function() {
     document.getElementById("modalEditar").style.display = "none";
-};
-
-/* =========================================
-PDF COM LOGO
-========================================= */
-window.gerarPDF = function() {
-    db.collection("escalas").orderBy("data").get()
-    .then(snapshot => {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-
-        let y = 35;
-        let img = new Image();
-        img.src = "logo.png";
-
-        img.onload = function() {
-            doc.addImage(img, "PNG", 10, 10, 18, 18);
-            doc.setFontSize(18);
-            doc.text("Paróquia Santíssima Trindade - Matriz São Jorge", 30, 20);
-            doc.setFontSize(10)
-            doc.text("Escala Ministros Extraordinários da Distribuição da Sagrada Comunhão", 30, 25);
-            y = 35;
-
-            let agrupado = {};
-
-            snapshot.forEach(item => {
-                let e = item.data();
-                if (!agrupado[e.data]) {
-                    agrupado[e.data] = [];
-                }
-
-                agrupado[e.data].push(e);
-            });
-
-            for (let data in agrupado) {
-                doc.setFontSize(8);
-                doc.setFont(undefined, "bold");
-                doc.text(formatarDataCompleta(data), 10, y);
-                y += 4;
-
-                doc.setFont(undefined, "normal");
-
-                agrupado[data].forEach(item => {
-                    doc.text(
-                        item.hora + "h - Ministros: " + item.ministros.join(", "),
-                        10,
-                        y
-                    );
-                    y += 4;
-                });
-
-                y += 2;
-
-                if (y > 275) {
-                    doc.addPage();
-                    y = 20;
-                }
-            }
-
-            doc.save("escala-ministros.pdf");
-        };
-    });
 };
 
 /* =========================================
