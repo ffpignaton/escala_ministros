@@ -1,5 +1,44 @@
-// Função para salvar ministros
-function salvarMinistro(){
+alert("BEM VINDO AO PAINEL ADMINISTRATIVO");
+
+/* =========================================
+VARIÁVEIS GLOBAIS
+========================================= */
+let ministrosSelecionados = [];
+let ministrosEdicao = [];
+let escalaEditandoId = null;
+let calendarAdmin = null;
+
+/* =========================================
+ABRIR TELAS
+========================================= */
+window.abrirTela = function(id){
+    // Esconde todas as telas
+    document.querySelectorAll(".tela").forEach(sec => {
+        sec.classList.add("hidden");
+    });
+
+    // Exibe a tela específica
+    document.getElementById(id).classList.remove("hidden");
+
+    if(id === "ministros") {
+        carregarMinistros();
+    }
+
+    if(id === "escalas") {
+        carregarMinistrosEscala();
+        listarEscalas();
+        iniciarCalendario();
+    }
+
+    if(id === "relatorios") {
+        // Lógica do relatório
+    }
+};
+
+/* =========================================
+MINISTROS
+========================================= */
+window.salvarMinistro = function(){
     let nome = document.getElementById("nome").value.trim();
     let fone = document.getElementById("fone").value.trim();
     let endereco = document.getElementById("endereco").value.trim();
@@ -20,9 +59,8 @@ function salvarMinistro(){
         carregarMinistros();
         alert("Ministro salvo!");
     });
-}
+};
 
-// Função para carregar os ministros
 function carregarMinistros() {
     let lista = document.getElementById("listaMinistros");
     lista.innerHTML = "";
@@ -33,7 +71,9 @@ function carregarMinistros() {
 
             lista.innerHTML += `
             <tr>
-                <td style="padding: 8px; border: 1px solid #ddd;"><input type="checkbox" class="checkbox" data-id="${doc.id}"></td>
+                <td style="padding: 8px; text-align: center;">
+                    <input type="checkbox" class="ministro-checkbox" data-id="${doc.id}" style="margin-right: 10px;">
+                </td>
                 <td style="padding: 8px; border: 1px solid #ddd;">${m.nome}</td>
                 <td style="padding: 8px; border: 1px solid #ddd;">${m.fone || ""}</td>
                 <td style="padding: 8px; border: 1px solid #ddd;">${m.endereco || ""}</td>
@@ -43,9 +83,8 @@ function carregarMinistros() {
     });
 }
 
-// Função para deletar ministros selecionados
-function deletarMinistrosSelecionados() {
-    const checkboxes = document.querySelectorAll('.checkbox:checked');
+window.deletarMinistrosSelecionados = function() {
+    const checkboxes = document.querySelectorAll('.ministro-checkbox:checked');
     
     if (checkboxes.length === 0) {
         alert("Selecione pelo menos um ministro para deletar.");
@@ -64,76 +103,169 @@ function deletarMinistrosSelecionados() {
                 alert("Ocorreu um erro ao tentar deletar o ministro.");
             });
     });
-}
+};
 
-// Função para salvar escala
-function salvarEscala(){
-    let data = document.getElementById("dataEscala").value.trim();
-    let hora = document.getElementById("horaEscala").value.trim();
+/* =========================================
+ESCALAS
+========================================= */
+function carregarMinistrosEscala() {
+    let box = document.getElementById("seletorMinistros");
+    box.innerHTML = "";
+    ministrosSelecionados = [];
 
-    if(!data || !hora){
-        alert("Preencha todos os campos.");
-        return;
-    }
-
-    let ministrosSelecionados = []; // Aqui você vai pegar os ministros selecionados
-
-    db.collection("escalas").add({
-        data: data,
-        hora: hora,
-        ministros: ministrosSelecionados // Aqui você vai passar os ministros selecionados
-    }).then(() => {
-        listarEscalas();
-        alert("Escala salva!");
-    });
-}
-
-// Função para listar as escalas
-function listarEscalas() {
-    let lista = document.getElementById("listaEscalas");
-    lista.innerHTML = "";
-
-    db.collection("escalas").get()
-    .then(snapshot => {
+    db.collection("ministros").get().then(snapshot => {
         snapshot.forEach(doc => {
-            let e = doc.data();
-
-            lista.innerHTML += `
-            <tr>
-                <td style="padding: 8px; border: 1px solid #ddd;"><input type="checkbox" class="checkbox" data-id="${doc.id}"></td>
-                <td style="padding: 8px; border: 1px solid #ddd;">${e.data}</td>
-                <td style="padding: 8px; border: 1px solid #ddd;">${e.hora}</td>
-                <td style="padding: 8px; border: 1px solid #ddd;">${e.ministros.join(", ")}</td>
-            </tr>
+            let nome = doc.data().nome;
+            box.innerHTML += `
+            <div class="tag" onclick="toggleMinistro(this,'${nome}')">${nome}</div>
             `;
         });
     });
 }
 
-// Função para deletar escalas selecionadas
-function deletarEscalasSelecionadas() {
-    const checkboxes = document.querySelectorAll('.checkbox:checked');
-    
-    if (checkboxes.length === 0) {
-        alert("Selecione pelo menos uma escala para deletar.");
+window.toggleMinistro = function(el, nome) {
+    if (ministrosSelecionados.includes(nome)) {
+        ministrosSelecionados = ministrosSelecionados.filter(x => x !== nome);
+        el.classList.remove("active");
+    } else {
+        ministrosSelecionados.push(nome);
+        el.classList.add("active");
+    }
+};
+
+window.salvarEscala = function() {
+    let data = document.getElementById("dataEscala").value;
+    let hora = document.getElementById("horaEscala").value;
+
+    if (!data || !hora) {
+        alert("Preencha data e hora.");
         return;
     }
 
-    checkboxes.forEach(checkbox => {
-        const id = checkbox.getAttribute('data-id');
-        db.collection("escalas").doc(id).delete()
-            .then(() => {
-                listarEscalas();
-                alert("Escala(s) deletada(s) com sucesso!");
-            })
-            .catch(err => {
-                console.error("Erro ao deletar escala: ", err);
-                alert("Ocorreu um erro ao tentar deletar a escala.");
-            });
+    if (ministrosSelecionados.length === 0) {
+        alert("Selecione ministros.");
+        return;
+    }
+
+    db.collection("escalas").add({
+        data: data,
+        hora: hora,
+        ministros: ministrosSelecionados
+    }).then(() => {
+        listarEscalas();
+        atualizarCalendario();
+        alert("Escala salva!");
+    });
+};
+
+function listarEscalas() {
+    let lista = document.getElementById("listaEscalasCards");
+    lista.innerHTML = "";
+
+    db.collection("escalas").orderBy("data").get()
+    .then(snapshot => {
+        snapshot.forEach(doc => {
+            let e = doc.data();
+
+            lista.innerHTML += `
+            <div class="card" style="padding:14px;margin-bottom:10px">
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+                    <div>
+                        <strong>${formatarDataCompleta(e.data)}</strong> - ${e.hora}
+                    </div>
+                </div>
+                <div style="margin-top:10px;color:#555">${e.ministros.join(", ")}</div>
+            </div>
+            `;
+        });
     });
 }
 
-// Chama a função para abrir a tela inicial
+/* =========================================
+CALENDÁRIO
+========================================= */
+function iniciarCalendario() {
+    if (calendarAdmin) {
+        atualizarCalendario();
+        return;
+    }
+
+    calendarAdmin = new FullCalendar.Calendar(
+        document.getElementById("calendarAdmin"), {
+        initialView: "dayGridMonth",
+        locale: "pt-br",
+        height: "auto",
+        contentHeight: "auto",
+        headerToolbar: {
+            left: "prev,next today",
+            center: "title",
+            right: ""
+        },
+        buttonText: {
+            today: "Hoje"
+        },
+        eventDisplay: "list-item",
+        eventClick: function(info) {
+            alert(
+                "Data: " + formatarDataCompleta(info.event.startStr) +
+                "\nHora: " + info.event.title +
+                "\nMinistros: " +
+                (info.event.extendedProps.ministros || []).join(", ")
+            );
+        },
+        datesSet: function() {
+            setTimeout(ajustarTituloCalendario, 100);
+        }
+    });
+
+    calendarAdmin.render();
+    ajustarTituloCalendario();
+    atualizarCalendario();
+}
+
+function atualizarCalendario() {
+    if (!calendarAdmin) return;
+
+    calendarAdmin.removeAllEvents();
+
+    db.collection("escalas").get().then(snapshot => {
+        snapshot.forEach(doc => {
+            let e = doc.data();
+
+            calendarAdmin.addEvent({
+                title: e.hora,
+                start: e.data,
+                ministros: e.ministros
+            });
+        });
+    });
+}
+
+function ajustarTituloCalendario() {
+    let t = document.querySelector(".fc-toolbar-title");
+    if (!t) return;
+
+    t.innerText =
+        t.innerText.charAt(0).toUpperCase() +
+        t.innerText.slice(1);
+}
+
+/* =========================================
+UTIL
+========================================= */
+function formatarDataCompleta(dataISO) {
+    const data = new Date(dataISO + "T00:00:00");
+    return data.toLocaleDateString("pt-BR", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+    }).replace(/^./, c => c.toUpperCase());
+}
+
+/* =========================================
+INÍCIO
+========================================= */
 window.onload = function() {
     abrirTela("dashboard");
 };
