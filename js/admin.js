@@ -11,7 +11,7 @@ let calendarAdmin = null;
 /* =========================================
 ABRIR TELAS
 ========================================= */
-window.abrirTela = function(id){
+window.abrirTela = function(id) {
     // Esconde todas as telas
     document.querySelectorAll(".tela").forEach(sec => {
         sec.classList.add("hidden");
@@ -41,12 +41,12 @@ window.abrirTela = function(id){
 /* =========================================
 MINISTROS
 ========================================= */
-window.salvarMinistro = function(){
+window.salvarMinistro = function() {
     let nome = document.getElementById("nome").value.trim();
     let fone = document.getElementById("fone").value.trim();
     let endereco = document.getElementById("endereco").value.trim();
 
-    if(!nome){
+    if(!nome) {
         alert("Digite o nome.");
         return;
     }
