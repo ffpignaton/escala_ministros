@@ -84,36 +84,36 @@ function carregarMinistros() {
 }
 
 window.editarMinistro = function(id, nomeAtual, foneAtual) {
-    let novoNome = prompt("Nome:", nomeAtual);
-    if (!novoNome) return;
+    let novoNome = prompt("Nome:", nomeAtual);
+    if (!novoNome) return;
 
-    let novoFone = prompt("Telefone:", foneAtual);
-    if (novoFone) {
-        novoFone = formatarTelefone(novoFone);
-    }
+    let novoFone = prompt("Telefone:", foneAtual);
+    if (novoFone) {
+        novoFone = formatarTelefone(novoFone);
+    }
 
-    db.collection("ministros").doc(id).update({
-        nome: novoNome,
-        fone: novoFone
-    }).then(() => {
-        carregarMinistros();
-    });
+    db.collection("ministros").doc(id).update({
+        nome: novoNome,
+        fone: novoFone
+    }).then(() => {
+        carregarMinistros();
+    });
 };
 
 function formatarTelefone(telefone) {
-    // Remove qualquer caractere não numérico
-    telefone = telefone.replace(/\D/g, "");
+    // Remove qualquer caractere não numérico
+    telefone = telefone.replace(/\D/g, "");
 
-    // Aplica o formato (00) 00000-0000
-    if (telefone.length <= 10) {
-        // Para números de até 10 dígitos (sem o DDD completo)
-        telefone = telefone.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
-    } else if (telefone.length <= 11) {
-        // Para números de 11 dígitos
-        telefone = telefone.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
-    }
+    // Aplica o formato (00) 00000-0000
+    if (telefone.length <= 10) {
+        // Para números de até 10 dígitos (sem o DDD completo)
+        telefone = telefone.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+    } else if (telefone.length <= 11) {
+        // Para números de 11 dígitos
+        telefone = telefone.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+    }
 
-    return telefone;
+    return telefone;
 }
 
 /* =========================================
@@ -195,6 +195,23 @@ function listarEscalas() {
         });
     });
 }
+
+window.editarEscala = function(id, dataAtual, horaAtual) {
+    let novaData = prompt("Nova data:", dataAtual);
+    if (!novaData) return;
+
+    let novaHora = prompt("Nova hora:", horaAtual);
+    if (!novaHora) return;
+
+    db.collection("escalas").doc(id).update({
+        data: novaData,
+        hora: novaHora
+    }).then(() => {
+        listarEscalas();
+        atualizarCalendario();
+        alert("Escala atualizada!");
+    });
+};
 
 window.deletarEscala = function(id) {
     if (!confirm("Excluir escala?")) return;
