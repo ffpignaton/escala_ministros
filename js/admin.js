@@ -279,3 +279,12 @@ INÍCIO
 window.onload = function() {
     abrirTela("dashboard");
 };
+
+function mascaraTelefone(input) {
+    let valor = input.value.replace(/\D/g, "");
+    if (valor.length <= 10) {
+        input.value = valor.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+    } else {
+        input.value = valor.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+    }
+}
