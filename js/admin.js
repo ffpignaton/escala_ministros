@@ -41,6 +41,8 @@ MINISTROS
 window.salvarMinistro = function(){
     let nome = document.getElementById("nome").value.trim();
     let fone = document.getElementById("fone").value.trim();
+    let email = document.getElementById("email").value.trim();
+    let endereco = document.getElementById("endereco").value.trim();
 
     if(!nome){
         alert("Digite o nome.");
@@ -49,10 +51,14 @@ window.salvarMinistro = function(){
 
     db.collection("ministros").add({
         nome: nome,
-        fone: fone
+        fone: fone,
+        email: email,
+        endereco: endereco
     }).then(() => {
         document.getElementById("nome").value = "";
         document.getElementById("fone").value = "";
+        document.getElementById("email").value = "";
+        document.getElementById("endereco").value = "";
         carregarMinistros();
         alert("Ministro salvo!");
     });
@@ -68,9 +74,13 @@ function carregarMinistros() {
 
             lista.innerHTML += `
             <tr>
-                <td style="padding: 8px; text-align: center;"><input type="checkbox" class="ministro-checkbox" data-id="${doc.id}" style="margin-right: 10px;"></td>
+                <td style="padding: 8px; text-align: center;">
+                    <input type="checkbox" class="ministro-checkbox" data-id="${doc.id}" style="margin-right: 10px;">
+                </td>
                 <td style="padding: 8px; border: 1px solid #ddd;">${m.nome}</td>
                 <td style="padding: 8px; border: 1px solid #ddd;">${m.fone || ""}</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">${m.email || ""}</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">${m.endereco || ""}</td>
             </tr>
             `;
         });
