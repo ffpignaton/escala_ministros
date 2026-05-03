@@ -84,6 +84,7 @@ function toggleSelecaoLinha(linha) {
     linha.classList.toggle('selecionada');
     const id = linha.getAttribute('data-id');
 
+    // Se a linha for selecionada, adiciona ao array de ministros
     if (linha.classList.contains('selecionada')) {
         ministrosSelecionados.push(id);
     } else {
