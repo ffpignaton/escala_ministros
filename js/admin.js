@@ -70,10 +70,7 @@ function carregarMinistros() {
             let m = doc.data();
 
             lista.innerHTML += `
-            <tr>
-                <td style="padding: 8px; text-align: center;">
-                    <input type="checkbox" class="ministro-checkbox" data-id="${doc.id}" style="margin-right: 10px;">
-                </td>
+            <tr onclick="marcarLinha(this)" class="ministro-linha" data-id="${doc.id}">
                 <td style="padding: 8px; border: 1px solid #ddd;">${m.nome}</td>
                 <td style="padding: 8px; border: 1px solid #ddd;">${m.fone || ""}</td>
                 <td style="padding: 8px; border: 1px solid #ddd;">${m.endereco || ""}</td>
@@ -83,16 +80,25 @@ function carregarMinistros() {
     });
 }
 
+function marcarLinha(linha) {
+    // Remove a cor azul das outras linhas
+    let linhas = document.querySelectorAll('.ministro-linha');
+    linhas.forEach(l => l.classList.remove('selecionada'));
+
+    // Marca a linha clicada
+    linha.classList.add('selecionada');
+}
+
 window.deletarMinistrosSelecionados = function() {
-    const checkboxes = document.querySelectorAll('.ministro-checkbox:checked');
-    
-    if (checkboxes.length === 0) {
+    const ministrosSelecionados = document.querySelectorAll('.ministro-linha.selecionada');
+
+    if (ministrosSelecionados.length === 0) {
         alert("Selecione pelo menos um ministro para deletar.");
         return;
     }
 
-    checkboxes.forEach(checkbox => {
-        const id = checkbox.getAttribute('data-id');
+    ministrosSelecionados.forEach(linha => {
+        const id = linha.getAttribute('data-id');
         db.collection("ministros").doc(id).delete()
             .then(() => {
                 carregarMinistros();
