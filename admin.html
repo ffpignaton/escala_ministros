@@ -71,7 +71,17 @@ oninput="mascaraTelefone(this)">
 
 <div class="card">
 <h2>Lista de Ministros</h2>
-<div id="listaMinistros"></div>
+<!-- Tabela com nome, telefone e checkbox -->
+<table id="tabelaMinistros" style="width: 100%; border-collapse: collapse;">
+  <thead>
+    <tr>
+      <th style="padding: 8px; border: 1px solid #ddd;">Selecionar</th>
+      <th style="padding: 8px; border: 1px solid #ddd;">Nome</th>
+      <th style="padding: 8px; border: 1px solid #ddd;">Telefone</th>
+    </tr>
+  </thead>
+  <tbody id="listaMinistros"></tbody>
+</table>
 
 <!-- Botão de deletar os selecionados -->
 <button onclick="deletarMinistrosSelecionados()">Deletar Selecionados</button>
