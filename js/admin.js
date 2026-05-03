@@ -84,55 +84,31 @@ function carregarMinistros() {
 }
 
 window.editarMinistro = function(id, nomeAtual, foneAtual) {
-    // Preenche o modal com os dados atuais
-    document.getElementById('editNome').value = nomeAtual;
-    document.getElementById('editFone').value = foneAtual;
+    let novoNome = prompt("Nome:", nomeAtual);
+    if (!novoNome) return;
 
-    // Exibe o modal
-    document.getElementById('modalEditar').style.display = 'flex';
-
-    // Salva a edição ao clicar em "Salvar"
-    document.getElementById('btnSalvarEdicao').onclick = function() {
-        salvarEdicaoMinistro(id);
-    };
-
-    // Fecha o modal ao clicar em "Cancelar"
-    document.getElementById('btnCancelarEdicao').onclick = function() {
-        fecharModalEditar();
-    };
-}
-
-function salvarEdicaoMinistro(id) {
-    let nome = document.getElementById('editNome').value;
-    let fone = document.getElementById('editFone').value;
-
-    if (!nome || !fone) {
-        alert("Todos os campos devem ser preenchidos.");
-        return;
+    let novoFone = prompt("Telefone:", foneAtual);
+    if (novoFone) {
+        novoFone = formatarTelefone(novoFone);
     }
 
     db.collection("ministros").doc(id).update({
-        nome: nome,
-        fone: fone
+        nome: novoNome,
+        fone: novoFone
     }).then(() => {
         carregarMinistros();
-        fecharModalEditar();
-        alert("Ministro atualizado!");
-    });
-}
-
-function fecharModalEditar() {
-    document.getElementById('modalEditar').style.display = 'none';
-}
-
-window.deletarMinistro = function(id) {
-    if (!confirm("Excluir ministro?")) return;
-
-    db.collection("ministros").doc(id).delete().then(() => {
-        carregarMinistros();
-        alert("Ministro excluído!");
     });
 };
+
+function formatarTelefone(telefone) {
+    telefone = telefone.replace(/\D/g, "");
+    if (telefone.length <= 10) {
+        telefone = telefone.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+    } else if (telefone.length <= 11) {
+        telefone = telefone.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+    }
+    return telefone;
+}
 
 /* =========================================
 ESCALAS
@@ -223,66 +199,6 @@ window.deletarEscala = function(id) {
     });
 };
 
-window.editarEscala = function(id, dataAtual, horaAtual) {
-    // Preenche o modal com os dados atuais
-    document.getElementById('editData').value = dataAtual;
-    document.getElementById('editHora').value = horaAtual;
-
-    // Exibe o modal
-    document.getElementById('modalEditar').style.display = 'flex';
-
-    // Carrega o seletor de ministros e configura o evento para o "Salvar"
-    carregarSelectMinistrosEscala(id).then(() => {
-        document.getElementById('btnSalvarEdicao').onclick = function() {
-            salvarEdicaoEscala(id);
-        };
-
-        // Fechar modal ao clicar em "Cancelar"
-        document.getElementById('btnCancelarEdicao').onclick = function() {
-            fecharModalEditar();
-        };
-    });
-}
-
-function carregarSelectMinistrosEscala(id) {
-    return new Promise((resolve, reject) => {
-        let ministrosSelect = document.getElementById('ministrosSelect');
-        ministrosSelect.innerHTML = ''; // Limpa as opções
-
-        db.collection("ministros").get().then(snapshot => {
-            snapshot.forEach(doc => {
-                ministrosSelect.innerHTML += `<option value="${doc.id}">${doc.data().nome}</option>`;
-            });
-            resolve();
-        }).catch(err => reject(err));
-    });
-}
-
-function salvarEdicaoEscala(id) {
-    let data = document.getElementById('editData').value;
-    let hora = document.getElementById('editHora').value;
-    let ministros = Array.from(document.getElementById('ministrosSelect').selectedOptions).map(option => option.value);
-
-    if (!data || !hora || ministros.length === 0) {
-        alert("Preencha todos os campos.");
-        return;
-    }
-
-    db.collection("escalas").doc(id).update({
-        data: data,
-        hora: hora,
-        ministros: ministros
-    }).then(() => {
-        listarEscalas();
-        fecharModalEditar();
-        alert("Escala atualizada!");
-    });
-}
-
-function fecharModalEditar() {
-    document.getElementById('modalEditar').style.display = 'none';
-}
-
 /* =========================================
 CALENDÁRIO
 ========================================= */
@@ -351,6 +267,71 @@ function ajustarTituloCalendario() {
         t.innerText.charAt(0).toUpperCase() +
         t.innerText.slice(1);
 }
+
+/* =========================================
+PDF COM LOGO
+========================================= */
+window.gerarPDF = function() {
+    db.collection("escalas").orderBy("data").get()
+    .then(snapshot => {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        let y = 35;
+
+        /* Carregar logo */
+        let img = new Image();
+        img.src = "logo.png";
+
+        img.onload = function() {
+            doc.addImage(img, "PNG", 10, 10, 18, 18);
+            doc.setFontSize(18);
+            doc.text("Paróquia Santíssima Trindade - Matriz São Jorge", 30, 20); // Alinha título à direita do logo
+            doc.setFontSize(10)
+            doc.text("Escala Ministros Extraordinários da Distribuição da Sagrada Comunhão", 30, 25);
+            y = 35;
+
+            let agrupado = {};
+
+            snapshot.forEach(item => {
+                let e = item.data();
+                if (!agrupado[e.data]) {
+                    agrupado[e.data] = [];
+                }
+
+                agrupado[e.data].push(e);
+            });
+
+            // Exibe cada data e suas escalas
+            for (let data in agrupado) {
+                doc.setFontSize(8);
+                doc.setFont(undefined, "bold");
+                doc.text(formatarDataCompleta(data), 10, y);
+                y += 4;
+
+                doc.setFont(undefined, "normal");
+
+                agrupado[data].forEach(item => {
+                    doc.text(
+                        item.hora + "h - Ministros: " + item.ministros.join(", "),
+                        10,
+                        y
+                    );
+                    y += 4;
+                });
+
+                y += 2;
+
+                if (y > 275) {
+                    doc.addPage();
+                    y = 20;
+                }
+            }
+
+            doc.save("escala-ministros.pdf");
+        };
+    });
+};
 
 /* =========================================
 UTIL
