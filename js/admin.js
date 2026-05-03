@@ -1,4 +1,4 @@
-alert("BEM VINDO AO PAINEL");
+alert("BEM VINDO AO PAINEL ADMINISTRATIVO");
 
 /* =========================================
 VARIÁVEIS GLOBAIS
@@ -18,7 +18,10 @@ window.abrirTela = function(id){
     });
 
     // Exibe a tela específica
-    document.getElementById(id).classList.remove("hidden");
+    let targetScreen = document.getElementById(id);
+    if (targetScreen) {
+        targetScreen.classList.remove("hidden");
+    }
 
     if(id === "ministros") {
         carregarMinistros();
@@ -31,7 +34,7 @@ window.abrirTela = function(id){
     }
 
     if(id === "relatorios") {
-        // Lógica do relatório
+        // Lógica do relatório (deixar vazio ou adicionar conteúdo)
     }
 };
 
