@@ -1,4 +1,4 @@
-alert("BEM VINDO AO PAINEL ADMINISTRATIVO");
+alert("Paz e Bem");
 
 /* =========================================
 VARIÁVEIS GLOBAIS
@@ -200,6 +200,7 @@ window.editarEscala = function(id, dataAtual, horaAtual) {
     ministrosSelect.innerHTML = '';
 
     db.collection("ministros").get().then(snapshot => {
+        // Preencher os ministros no dropdown
         snapshot.forEach(doc => {
             ministrosSelect.innerHTML += `<option value="${doc.id}">${doc.data().nome}</option>`;
         });
@@ -208,7 +209,7 @@ window.editarEscala = function(id, dataAtual, horaAtual) {
         document.getElementById('editData').value = dataAtual;
         document.getElementById('editHora').value = horaAtual;
 
-        // Mostrar o modal de edição
+        // Agora, abrir o modal após os ministros estarem carregados
         document.getElementById('modalEditar').style.display = 'flex';
 
         // Ao clicar em salvar, atualize a escala
