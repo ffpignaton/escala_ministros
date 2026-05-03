@@ -70,6 +70,7 @@ function carregarMinistros() {
             <div class="card" style="padding:12px;margin-bottom:10px">
                 <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
                     <div>
+                        <input type="checkbox" class="ministro-checkbox" data-id="${doc.id}">
                         <strong>${m.nome}</strong> - ${m.fone || ""}
                     </div>
                 </div>
@@ -78,6 +79,28 @@ function carregarMinistros() {
         });
     });
 }
+
+window.deletarMinistrosSelecionados = function() {
+    const checkboxes = document.querySelectorAll('.ministro-checkbox:checked');
+    
+    if (checkboxes.length === 0) {
+        alert("Selecione pelo menos um ministro para deletar.");
+        return;
+    }
+
+    checkboxes.forEach(checkbox => {
+        const id = checkbox.getAttribute('data-id');
+        db.collection("ministros").doc(id).delete()
+            .then(() => {
+                carregarMinistros();
+                alert("Ministro(s) deletado(s) com sucesso!");
+            })
+            .catch(err => {
+                console.error("Erro ao deletar ministro: ", err);
+                alert("Ocorreu um erro ao tentar deletar o ministro.");
+            });
+    });
+};
 
 /* =========================================
 ESCALAS
@@ -223,71 +246,6 @@ function ajustarTituloCalendario() {
         t.innerText.charAt(0).toUpperCase() +
         t.innerText.slice(1);
 }
-
-/* =========================================
-PDF COM LOGO
-========================================= */
-window.gerarPDF = function() {
-    db.collection("escalas").orderBy("data").get()
-    .then(snapshot => {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-
-        let y = 35;
-
-        /* Carregar logo */
-        let img = new Image();
-        img.src = "logo.png";
-
-        img.onload = function() {
-            doc.addImage(img, "PNG", 10, 10, 18, 18);
-            doc.setFontSize(18);
-            doc.text("Paróquia Santíssima Trindade - Matriz São Jorge", 30, 20); // Alinha título à direita do logo
-            doc.setFontSize(10)
-            doc.text("Escala Ministros Extraordinários da Distribuição da Sagrada Comunhão", 30, 25);
-            y = 35;
-
-            let agrupado = {};
-
-            snapshot.forEach(item => {
-                let e = item.data();
-                if (!agrupado[e.data]) {
-                    agrupado[e.data] = [];
-                }
-
-                agrupado[e.data].push(e);
-            });
-
-            // Exibe cada data e suas escalas
-            for (let data in agrupado) {
-                doc.setFontSize(8);
-                doc.setFont(undefined, "bold");
-                doc.text(formatarDataCompleta(data), 10, y);
-                y += 4;
-
-                doc.setFont(undefined, "normal");
-
-                agrupado[data].forEach(item => {
-                    doc.text(
-                        item.hora + "h - Ministros: " + item.ministros.join(", "),
-                        10,
-                        y
-                    );
-                    y += 4;
-                });
-
-                y += 2;
-
-                if (y > 275) {
-                    doc.addPage();
-                    y = 20;
-                }
-            }
-
-            doc.save("escala-ministros.pdf");
-        };
-    });
-};
 
 /* =========================================
 UTIL
