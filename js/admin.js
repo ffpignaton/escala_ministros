@@ -93,37 +93,20 @@ function abrirModalEditarMinistro(id, nomeAtual, foneAtual) {
     document.getElementById('editNome').value = nomeAtual;
     document.getElementById('editFone').value = foneAtual;
 
-    // Carregar o select de ministros para o modal
-    carregarSelectMinistros(id).then(() => {
-        // Exibe o modal
-        document.getElementById('modalEditar').style.display = 'flex';
-        // Salva a edição ao clicar em "Salvar"
-        document.getElementById('btnSalvarEdicao').onclick = function() {
-            salvarEdicaoMinistro(id);
-        };
-    });
-}
+    // Exibe o modal
+    document.getElementById('modalEditar').style.display = 'flex';
 
-function carregarSelectMinistros(id) {
-    return new Promise((resolve, reject) => {
-        let ministrosSelect = document.getElementById('ministrosSelect');
-        ministrosSelect.innerHTML = ''; // Limpar opções
-
-        db.collection("ministros").get().then(snapshot => {
-            snapshot.forEach(doc => {
-                ministrosSelect.innerHTML += `<option value="${doc.id}" ${doc.id === id ? 'selected' : ''}>${doc.data().nome}</option>`;
-            });
-            resolve();
-        }).catch(err => reject(err));
-    });
+    // Salva a edição ao clicar em "Salvar"
+    document.getElementById('btnSalvarEdicao').onclick = function() {
+        salvarEdicaoMinistro(id);
+    };
 }
 
 function salvarEdicaoMinistro(id) {
     let nome = document.getElementById('editNome').value;
     let fone = document.getElementById('editFone').value;
-    let ministroId = document.getElementById('ministrosSelect').value; // Ministro selecionado
 
-    if (!nome || !fone || !ministroId) {
+    if (!nome || !fone) {
         alert("Todos os campos devem ser preenchidos.");
         return;
     }
@@ -141,6 +124,15 @@ function salvarEdicaoMinistro(id) {
 function fecharModalEditar() {
     document.getElementById('modalEditar').style.display = 'none';
 }
+
+window.deletarMinistro = function(id) {
+    if (!confirm("Excluir ministro?")) return;
+
+    db.collection("ministros").doc(id).delete().then(() => {
+        carregarMinistros();
+        alert("Ministro excluído!");
+    });
+};
 
 function formatarTelefone(telefone) {
     // Remove qualquer caractere não numérico
@@ -244,6 +236,67 @@ window.deletarEscala = function(id) {
         atualizarCalendario();
     });
 };
+
+window.editarEscala = function(id, dataAtual, horaAtual) {
+    // Abre o modal de edição da escala
+    abrirModalEditarEscala(id, dataAtual, horaAtual);
+};
+
+function abrirModalEditarEscala(id, dataAtual, horaAtual) {
+    // Preenche o modal com os dados atuais da escala
+    document.getElementById('editData').value = dataAtual;
+    document.getElementById('editHora').value = horaAtual;
+
+    // Carregar o select de ministros para a edição da escala
+    carregarSelectMinistrosEscala(id).then(() => {
+        // Exibe o modal
+        document.getElementById('modalEditar').style.display = 'flex';
+
+        // Salva a edição ao clicar em "Salvar"
+        document.getElementById('btnSalvarEdicao').onclick = function() {
+            salvarEdicaoEscala(id);
+        };
+    });
+}
+
+function carregarSelectMinistrosEscala(id) {
+    return new Promise((resolve, reject) => {
+        let ministrosSelect = document.getElementById('ministrosSelect');
+        ministrosSelect.innerHTML = ''; // Limpar opções
+
+        db.collection("ministros").get().then(snapshot => {
+            snapshot.forEach(doc => {
+                ministrosSelect.innerHTML += `<option value="${doc.id}">${doc.data().nome}</option>`;
+            });
+            resolve();
+        }).catch(err => reject(err));
+    });
+}
+
+function salvarEdicaoEscala(id) {
+    let data = document.getElementById('editData').value;
+    let hora = document.getElementById('editHora').value;
+    let ministros = Array.from(document.getElementById('ministrosSelect').selectedOptions).map(option => option.value);
+
+    if (!data || !hora || ministros.length === 0) {
+        alert("Preencha todos os campos.");
+        return;
+    }
+
+    db.collection("escalas").doc(id).update({
+        data: data,
+        hora: hora,
+        ministros: ministros
+    }).then(() => {
+        listarEscalas();
+        fecharModalEditar();
+        alert("Escala atualizada!");
+    });
+}
+
+function fecharModalEditar() {
+    document.getElementById('modalEditar').style.display = 'none';
+}
 
 /* =========================================
 CALENDÁRIO
