@@ -33,17 +33,21 @@ window.abrirTela = function(id) {
     if(id === "relatorios") {
         // Lógica do relatório
     }
+
+    if(id === "dashboard") {
+        // Lógica do dashboard
+    }
 };
 
 /* =========================================
 MINISTROS
 ========================================= */
-window.salvarMinistro = function(){
+window.salvarMinistro = function() {
     let nome = document.getElementById("nome").value.trim();
     let fone = document.getElementById("fone").value.trim();
     let endereco = document.getElementById("endereco").value.trim();
 
-    if(!nome){
+    if (!nome) {
         alert("Digite o nome.");
         return;
     }
