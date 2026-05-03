@@ -23,17 +23,17 @@ window.abrirTela = function(id) {
         targetScreen.classList.remove("hidden");
     }
 
-    if(id === "ministros") {
+    if (id === "ministros") {
         carregarMinistros();
     }
 
-    if(id === "escalas") {
+    if (id === "escalas") {
         carregarMinistrosEscala();
         listarEscalas();
         iniciarCalendario();
     }
 
-    if(id === "relatorios") {
+    if (id === "relatorios") {
         // Lógica do relatório (deixar vazio ou adicionar conteúdo)
     }
 };
@@ -46,7 +46,7 @@ window.salvarMinistro = function() {
     let fone = document.getElementById("fone").value.trim();
     let endereco = document.getElementById("endereco").value.trim();
 
-    if(!nome) {
+    if (!nome) {
         alert("Digite o nome.");
         return;
     }
