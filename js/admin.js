@@ -1,41 +1,5 @@
-alert("BEM VINDO AO PAINEL ADMINISTRATIVO");
-
-/* =========================================
-VARIÁVEIS GLOBAIS
-========================================= */
-let ministrosSelecionados = [];
-let ministrosEdicao = [];
-let escalaEditandoId = null;
-let calendarAdmin = null;
-
-/* =========================================
-ABRIR TELAS
-========================================= */
-window.abrirTela = function(id){
-    document.querySelectorAll(".tela").forEach(sec => {
-        sec.classList.add("hidden");
-    });
-
-    document.getElementById(id).classList.remove("hidden");
-
-    if(id === "ministros") {
-        carregarMinistros();
-    }
-
-    if(id === "escalas") {
-        carregarMinistrosEscala();
-        listarEscalas();
-    }
-
-    if(id === "relatorios") {
-        // Lógica do relatório
-    }
-};
-
-/* =========================================
-MINISTROS
-========================================= */
-window.salvarMinistro = function(){
+// Função para salvar ministros
+function salvarMinistro(){
     let nome = document.getElementById("nome").value.trim();
     let fone = document.getElementById("fone").value.trim();
     let endereco = document.getElementById("endereco").value.trim();
@@ -56,8 +20,9 @@ window.salvarMinistro = function(){
         carregarMinistros();
         alert("Ministro salvo!");
     });
-};
+}
 
+// Função para carregar os ministros
 function carregarMinistros() {
     let lista = document.getElementById("listaMinistros");
     lista.innerHTML = "";
@@ -67,7 +32,8 @@ function carregarMinistros() {
             let m = doc.data();
 
             lista.innerHTML += `
-            <tr onclick="marcarLinha(this)" data-id="${doc.id}">
+            <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;"><input type="checkbox" class="checkbox" data-id="${doc.id}"></td>
                 <td style="padding: 8px; border: 1px solid #ddd;">${m.nome}</td>
                 <td style="padding: 8px; border: 1px solid #ddd;">${m.fone || ""}</td>
                 <td style="padding: 8px; border: 1px solid #ddd;">${m.endereco || ""}</td>
@@ -77,16 +43,17 @@ function carregarMinistros() {
     });
 }
 
-window.deletarMinistrosSelecionados = function() {
-    const linhasSelecionadas = document.querySelectorAll('.selecionada');
+// Função para deletar ministros selecionados
+function deletarMinistrosSelecionados() {
+    const checkboxes = document.querySelectorAll('.checkbox:checked');
     
-    if (linhasSelecionadas.length === 0) {
+    if (checkboxes.length === 0) {
         alert("Selecione pelo menos um ministro para deletar.");
         return;
     }
 
-    linhasSelecionadas.forEach(linha => {
-        const id = linha.getAttribute('data-id');
+    checkboxes.forEach(checkbox => {
+        const id = checkbox.getAttribute('data-id');
         db.collection("ministros").doc(id).delete()
             .then(() => {
                 carregarMinistros();
@@ -97,42 +64,63 @@ window.deletarMinistrosSelecionados = function() {
                 alert("Ocorreu um erro ao tentar deletar o ministro.");
             });
     });
-};
+}
 
-/* =========================================
-ESCALAS
-========================================= */
+// Função para salvar escala
+function salvarEscala(){
+    let data = document.getElementById("dataEscala").value.trim();
+    let hora = document.getElementById("horaEscala").value.trim();
+
+    if(!data || !hora){
+        alert("Preencha todos os campos.");
+        return;
+    }
+
+    let ministrosSelecionados = []; // Aqui você vai pegar os ministros selecionados
+
+    db.collection("escalas").add({
+        data: data,
+        hora: hora,
+        ministros: ministrosSelecionados // Aqui você vai passar os ministros selecionados
+    }).then(() => {
+        listarEscalas();
+        alert("Escala salva!");
+    });
+}
+
+// Função para listar as escalas
 function listarEscalas() {
     let lista = document.getElementById("listaEscalas");
     lista.innerHTML = "";
 
-    db.collection("escalas").orderBy("data").get()
+    db.collection("escalas").get()
     .then(snapshot => {
         snapshot.forEach(doc => {
             let e = doc.data();
 
             lista.innerHTML += `
-            <tr onclick="marcarLinha(this)" data-id="${doc.id}">
-                <td style="padding: 8px; border: 1px solid #ddd;">${formatarDataCompleta(e.data)}</td>
+            <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;"><input type="checkbox" class="checkbox" data-id="${doc.id}"></td>
+                <td style="padding: 8px; border: 1px solid #ddd;">${e.data}</td>
                 <td style="padding: 8px; border: 1px solid #ddd;">${e.hora}</td>
                 <td style="padding: 8px; border: 1px solid #ddd;">${e.ministros.join(", ")}</td>
-                <td style="padding: 8px; border: 1px solid #ddd;">${e.observacoes || ""}</td>
             </tr>
             `;
         });
     });
 }
 
-window.deletarEscalasSelecionadas = function() {
-    const linhasSelecionadas = document.querySelectorAll('.selecionada');
+// Função para deletar escalas selecionadas
+function deletarEscalasSelecionadas() {
+    const checkboxes = document.querySelectorAll('.checkbox:checked');
     
-    if (linhasSelecionadas.length === 0) {
+    if (checkboxes.length === 0) {
         alert("Selecione pelo menos uma escala para deletar.");
         return;
     }
 
-    linhasSelecionadas.forEach(linha => {
-        const id = linha.getAttribute('data-id');
+    checkboxes.forEach(checkbox => {
+        const id = checkbox.getAttribute('data-id');
         db.collection("escalas").doc(id).delete()
             .then(() => {
                 listarEscalas();
@@ -143,21 +131,9 @@ window.deletarEscalasSelecionadas = function() {
                 alert("Ocorreu um erro ao tentar deletar a escala.");
             });
     });
-};
-
-/* =========================================
-UTIL
-========================================= */
-function formatarDataCompleta(dataISO) {
-    const data = new Date(dataISO + "T00:00:00");
-    return data.toLocaleDateString("pt-BR", {
-        weekday: "long",
-        day: "numeric",
-        month: "long",
-        year: "numeric"
-    }).replace(/^./, c => c.toUpperCase());
 }
 
+// Chama a função para abrir a tela inicial
 window.onload = function() {
     abrirTela("dashboard");
 };
