@@ -72,21 +72,27 @@ window.salvarMinistro = function() {
     });
 };
 
-function carregarMinistrosEscala() {
-    let box = document.getElementById("seletorMinistros");
-    box.innerHTML = ""; // Limpar os ministros da escala
-    ministrosSelecionados = []; // Limpar ministros selecionados
+function carregarMinistros() {
+    let lista = document.getElementById("listaMinistros");
+    lista.innerHTML = ""; // Limpar lista antes de adicionar os novos ministros
 
     // Carregar ministros do Firestore
     db.collection("ministros").get().then(snapshot => {
         snapshot.forEach(doc => {
-            let nome = doc.data().nome;
-            box.innerHTML += `
-            <div class="tag" onclick="toggleMinistro(this,'${nome}')">${nome}</div>
+            let m = doc.data();
+            lista.innerHTML += `
+            <tr data-id="${doc.id}">
+                <td style="padding: 8px; border: 1px solid #ddd;">${m.nome}</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">${m.fone || ""}</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">${m.endereco || ""}</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">
+                    <button onclick="gerenciarMinistro('${doc.id}')">Editar/Excluir</button>
+                </td>
+            </tr>
             `;
         });
     }).catch(err => {
-        console.error("Erro ao carregar ministros para a escala: ", err);
+        console.error("Erro ao carregar ministros: ", err);
     });
 }
 
@@ -160,11 +166,11 @@ function carregarMinistrosEscala() {
 
 window.toggleMinistro = function(el, nome) {
     if (ministrosSelecionados.includes(nome)) {
-        ministrosSelecionados = ministrosSelecionados.filter(x => x !== nome);
-        el.classList.remove("active");
+        ministrosSelecionados = ministrosSelecionados.filter(x => x !== nome); // Remover ministro da seleção
+        el.classList.remove("active"); // Remover estilo de ativo
     } else {
-        ministrosSelecionados.push(nome);
-        el.classList.add("active");
+        ministrosSelecionados.push(nome); // Adicionar ministro à seleção
+        el.classList.add("active"); // Adicionar estilo de ativo
     }
 };
 
@@ -202,7 +208,7 @@ CARREGAR ESCALAS
 ========================================= */
 
 function listarEscalas() {
-    let lista = document.getElementById("listaEscalasCards");
+    let lista = document.getElementById("listaEscalas");
     lista.innerHTML = ""; // Limpar antes de adicionar novas escalas
 
     // Carregar as escalas do Firestore
@@ -210,15 +216,14 @@ function listarEscalas() {
         snapshot.forEach(doc => {
             let e = doc.data();
             lista.innerHTML += `
-            <div class="card" style="padding:14px;margin-bottom:10px">
-                <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
-                    <div>
-                        <strong>${formatarDataCompleta(e.data)}</strong> - ${e.hora}
-                    </div>
-                </div>
-                <div style="margin-top:10px;color:#555">${e.ministros.join(", ")}</div>
-                <button onclick="gerenciarEscala('${doc.id}')">Editar/Excluir</button>
-            </div>
+            <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;">${formatarDataCompleta(e.data)}</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">${e.hora}</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">${e.ministros.join(", ")}</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">
+                    <button onclick="gerenciarEscala('${doc.id}')">Editar/Excluir</button>
+                </td>
+            </tr>
             `;
         });
     }).catch(err => {
@@ -226,44 +231,17 @@ function listarEscalas() {
     });
 }
 
-window.gerenciarEscala = function(id) {
-    let acao = prompt("Deseja editar ou excluir esta escala? (Digite 'editar' ou 'excluir')").toLowerCase();
-
-    if (acao === 'excluir') {
-        if (confirm("Você tem certeza que deseja excluir esta escala?")) {
-            db.collection("escalas").doc(id).delete()
-                .then(() => {
-                    carregarEscalas();
-                    alert("Escala excluída com sucesso!");
-                })
-                .catch(err => {
-                    console.error("Erro ao deletar escala: ", err);
-                    alert("Ocorreu um erro ao tentar excluir a escala.");
-                });
-        }
-    } else if (acao === 'editar') {
-        let data = prompt("Digite a nova data da escala:");
-        let hora = prompt("Digite a nova hora da escala:");
-        let ministros = prompt("Digite os ministros (separados por vírgula):");
-
-        if (data && hora && ministros) {
-            db.collection("escalas").doc(id).update({
-                data: data,
-                hora: hora,
-                ministros: ministros.split(',').map(nome => nome.trim())
-            }).then(() => {
-                carregarEscalas();
-                alert("Escala editada com sucesso!");
-            }).catch(err => {
-                console.error("Erro ao editar escala: ", err);
-                alert("Ocorreu um erro ao tentar editar a escala.");
-            });
-        } else {
-            alert("Por favor, preencha todos os campos.");
-        }
-    } else {
-        alert("Ação inválida! Digite 'editar' ou 'excluir'.");
-    }
+/* =========================================
+FUNÇÃO DE FORMATAÇÃO DE DATA
+========================================= */
+function formatarDataCompleta(dataISO) {
+    const data = new Date(dataISO + "T00:00:00");
+    return data.toLocaleDateString("pt-BR", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+    }).replace(/^./, c => c.toUpperCase());
 }
 
 /* =========================================
@@ -333,19 +311,6 @@ function ajustarTituloCalendario() {
     t.innerText =
         t.innerText.charAt(0).toUpperCase() +
         t.innerText.slice(1);
-}
-
-/* =========================================
-UTIL
-========================================= */
-function formatarDataCompleta(dataISO) {
-    const data = new Date(dataISO + "T00:00:00");
-    return data.toLocaleDateString("pt-BR", {
-        weekday: "long",
-        day: "numeric",
-        month: "long",
-        year: "numeric"
-    }).replace(/^./, c => c.toUpperCase());
 }
 
 /* =========================================
