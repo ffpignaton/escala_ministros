@@ -74,7 +74,7 @@ window.salvarMinistro = function() {
 
 function carregarMinistros() {
     let lista = document.getElementById("listaMinistros");
-    lista.innerHTML = ""; // Limpar a lista antes de adicionar os novos ministros
+    lista.innerHTML = ""; // Limpar lista antes de adicionar os novos ministros
 
     // Carregar ministros do Firestore
     db.collection("ministros").get().then(snapshot => {
