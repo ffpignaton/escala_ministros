@@ -85,6 +85,9 @@ function carregarMinistros() {
                 <td style="padding: 8px; border: 1px solid #ddd;">${m.nome}</td>
                 <td style="padding: 8px; border: 1px solid #ddd;">${m.fone || ""}</td>
                 <td style="padding: 8px; border: 1px solid #ddd;">${m.endereco || ""}</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">
+                    <button onclick="gerenciarMinistro('${doc.id}')">Editar/Excluir</button>
+                </td>
             </tr>
             `;
         });
