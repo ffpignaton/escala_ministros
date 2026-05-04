@@ -28,7 +28,7 @@ window.abrirTela = function(id) {
     }
 
     if(id === "escalas") {
-        carregarEscalas(); 
+        carregarEscalas();  // Corrigido aqui
         carregarMinistrosEscala();
         listarEscalas();
         iniciarCalendario();
