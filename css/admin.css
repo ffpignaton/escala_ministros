@@ -1,184 +1,199 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
 }
 
-body {
-    font-family: Arial, Helvetica, sans-serif;
-    background: #eef2f7;
-    color: #222;
+body{
+    font-family:Arial,Helvetica,sans-serif;
+    background:#eef2f7;
+    color:#222;
 }
 
-.hidden {
-    display: none;
+.hidden{
+    display:none;
 }
 
-.dashboard {
-    display: flex;
-    min-height: 100vh;
+/* LAYOUT */
+.dashboard{
+    display:flex;
+    min-height:100vh;
 }
 
-.sidebar {
-    width: 260px;
-    background: linear-gradient(180deg, #0d47a1, #1565c0);
-    color: white;
-    padding: 25px;
+/* MENU */
+.sidebar{
+    width:260px;
+    background:linear-gradient(180deg,#0d47a1,#1565c0);
+    color:white;
+    padding:25px;
 }
 
-.sidebar h2 {
-    text-align: center;
-    margin-bottom: 30px;
+.sidebar h2{
+    text-align:center;
+    margin-bottom:30px;
 }
 
-.menu-item {
-    padding: 14px;
-    margin-bottom: 12px;
-    border-radius: 12px;
-    cursor: pointer;
-    background: rgba(255, 255, 255, 0.08);
-    transition: 0.3s;
+.menu-item{
+    padding:14px;
+    margin-bottom:12px;
+    border-radius:12px;
+    cursor:pointer;
+    background:rgba(255,255,255,0.08);
+    transition:.3s;
 }
 
-.menu-item:hover {
-    background: rgba(255, 255, 255, 0.18);
-    transform: translateX(4px);
+.menu-item:hover{
+    background:rgba(255,255,255,0.18);
+    transform:translateX(4px);
 }
 
-.main {
-    flex: 1;
-    padding: 30px;
+/* MAIN */
+.main{
+    flex:1;
+    padding:30px;
 }
 
-.topo {
-    background: white;
-    padding: 20px;
-    border-radius: 18px;
-    margin-bottom: 25px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+.topo{
+    background:white;
+    padding:20px;
+    border-radius:18px;
+    margin-bottom:25px;
+    box-shadow:0 4px 12px rgba(0,0,0,.05);
 }
 
-.card {
-    background: white;
-    padding: 22px;
-    border-radius: 18px;
-    margin-bottom: 20px;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+/* CARDS */
+.card{
+    background:white;
+    padding:22px;
+    border-radius:18px;
+    margin-bottom:20px;
+    box-shadow:0 6px 18px rgba(0,0,0,.05);
 }
 
-.card h2 {
-    margin-bottom: 15px;
-    color: #0d47a1;
+.card h2{
+    margin-bottom:15px;
+    color:#0d47a1;
 }
 
-input {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 12px;
-    margin-bottom: 12px;
+/* INPUTS */
+input{
+    width:100%;
+    padding:12px;
+    border:1px solid #ddd;
+    border-radius:12px;
+    margin-bottom:12px;
 }
 
-button {
-    border: none;
-    padding: 10px 18px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 14px;
-    transition: 0.3s;
-    margin-top: 8px;
+/* BOTÕES PADRÃO */
+button{
+    border:none;
+    padding:10px 18px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:bold;
+    font-size:14px;
+    transition:.3s;
+    margin-top:8px;
 }
 
-button:hover {
-    transform: translateY(-2px);
+button:hover{
+    transform:translateY(-2px);
 }
 
-button {
-    background: #1565c0;
-    color: white;
+/* SALVAR */
+button{
+    background:#1565c0;
+    color:white;
 }
 
-.botoes-linha {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-top: 12px;
+/* LINHA DE BOTÕES */
+.botoes-linha{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:12px;
 }
 
-.btn-edit {
-    background: #f1c40f;
-    color: #222;
-    min-width: 90px;
+/* EDITAR */
+.btn-edit{
+    background:#f1c40f;
+    color:#222;
+    min-width:90px;
 }
 
-.btn-delete {
-    background: #e74c3c;
-    color: white;
-    min-width: 90px;
+/* EXCLUIR */
+.btn-delete{
+    background:#e74c3c;
+    color:white;
+    min-width:90px;
 }
 
-.btn-save {
-    background: #27ae60;
-    color: white;
-    min-width: 120px;
+/* SALVAR */
+.btn-save{
+    background:#27ae60;
+    color:white;
+    min-width:120px;
 }
 
-.btn-cancel {
-    background: #999;
-    color: white;
-    min-width: 100px;
+/* CANCELAR */
+.btn-cancel{
+    background:#999;
+    color:white;
+    min-width:100px;
 }
 
-.tags-box {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 10px;
+/* TAGS */
+.tags-box{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:10px;
 }
 
-.tag {
-    padding: 8px 14px;
-    background: #e4eaf3;
-    border-radius: 30px;
-    cursor: pointer;
+.tag{
+    padding:8px 14px;
+    background:#e4eaf3;
+    border-radius:30px;
+    cursor:pointer;
 }
 
-.tag.active {
-    background: #1565c0;
-    color: white;
+.tag.active{
+    background:#1565c0;
+    color:white;
 }
 
-.modal-box {
-    background: white;
-    padding: 25px;
-    border-radius: 18px;
-    width: 420px;
-    max-width: 95%;
+/* MODAL */
+.modal-box{
+    background:white;
+    padding:25px;
+    border-radius:18px;
+    width:420px;
+    max-width:95%;
 }
 
-.modal-actions {
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
-    margin-top: 18px;
+.modal-actions{
+    display:flex;
+    gap:10px;
+    justify-content:flex-end;
+    margin-top:18px;
 }
 
-@media(max-width: 700px) {
-    .main {
-        padding: 15px;
+/* RESPONSIVO */
+@media(max-width:700px){
+    .main{
+        padding:15px;
     }
 
-    .sidebar {
-        width: 100%;
+    .sidebar{
+        width:100%;
     }
 
-    .botoes-linha {
-        flex-direction: column;
+    .botoes-linha{
+        flex-direction:column;
     }
 
-    button {
-        width: 100%;
+    button{
+        width:100%;
     }
 }
 
