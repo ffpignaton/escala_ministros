@@ -40,28 +40,146 @@ window.abrirTela = function(id) {
 };
 
 /* =========================================
-ESCALAS
+MINISTROS
 ========================================= */
+window.salvarMinistro = function() {
+    let nome = document.getElementById("nome").value.trim();
+    let fone = document.getElementById("fone").value.trim();
+    let endereco = document.getElementById("endereco").value.trim();
 
-function carregarEscalas() {
-    let lista = document.getElementById("listaEscalas");
-    lista.innerHTML = "";
+    if (!nome) {
+        alert("Digite o nome.");
+        return;
+    }
 
-    db.collection("escalas").get().then(snapshot => {
+    // Salvar o ministro no Firestore
+    db.collection("ministros").add({
+        nome: nome,
+        fone: fone,
+        endereco: endereco
+    }).then(() => {
+        // Limpar os campos após salvar
+        document.getElementById("nome").value = "";
+        document.getElementById("fone").value = "";
+        document.getElementById("endereco").value = "";
+        
+        // Carregar os ministros atualizados
+        carregarMinistros();
+        alert("Ministro salvo!");
+    }).catch(err => {
+        console.error("Erro ao salvar ministro: ", err);
+        alert("Erro ao salvar ministro.");
+    });
+};
+
+function carregarMinistros() {
+    let lista = document.getElementById("listaMinistros");
+    lista.innerHTML = ""; // Limpar a lista antes de adicionar os novos ministros
+
+    // Carregar ministros do Firestore
+    db.collection("ministros").get().then(snapshot => {
         snapshot.forEach(doc => {
-            let e = doc.data();
-
+            let m = doc.data();
             lista.innerHTML += `
-            <tr data-id="${doc.id}" onclick="gerenciarEscala('${doc.id}')">
-                <td style="padding: 8px; border: 1px solid #ddd;">${formatarDataCompleta(e.data)}</td>
-                <td style="padding: 8px; border: 1px solid #ddd;">${e.hora}</td>
-                <td style="padding: 8px; border: 1px solid #ddd;">${e.ministros.join(", ")}</td>
-                <td style="padding: 8px; border: 1px solid #ddd;">
-                    <button onclick="gerenciarEscala('${doc.id}')">Editar/Excluir</button>
-                </td>
+            <tr data-id="${doc.id}">
+                <td style="padding: 8px; border: 1px solid #ddd;">${m.nome}</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">${m.fone || ""}</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">${m.endereco || ""}</td>
             </tr>
             `;
         });
+    }).catch(err => {
+        console.error("Erro ao carregar ministros: ", err);
+    });
+}
+
+/* =========================================
+ESCALAS
+========================================= */
+
+function carregarMinistrosEscala() {
+    let box = document.getElementById("seletorMinistros");
+    box.innerHTML = ""; // Limpar os ministros da escala
+    ministrosSelecionados = []; // Limpar ministros selecionados
+
+    // Carregar ministros do Firestore
+    db.collection("ministros").get().then(snapshot => {
+        snapshot.forEach(doc => {
+            let nome = doc.data().nome;
+            box.innerHTML += `
+            <div class="tag" onclick="toggleMinistro(this,'${nome}')">${nome}</div>
+            `;
+        });
+    }).catch(err => {
+        console.error("Erro ao carregar ministros para a escala: ", err);
+    });
+}
+
+window.toggleMinistro = function(el, nome) {
+    if (ministrosSelecionados.includes(nome)) {
+        ministrosSelecionados = ministrosSelecionados.filter(x => x !== nome);
+        el.classList.remove("active");
+    } else {
+        ministrosSelecionados.push(nome);
+        el.classList.add("active");
+    }
+};
+
+window.salvarEscala = function() {
+    let data = document.getElementById("dataEscala").value;
+    let hora = document.getElementById("horaEscala").value;
+
+    if (!data || !hora) {
+        alert("Preencha data e hora.");
+        return;
+    }
+
+    if (ministrosSelecionados.length === 0) {
+        alert("Selecione ministros.");
+        return;
+    }
+
+    // Salvar a escala no Firestore
+    db.collection("escalas").add({
+        data: data,
+        hora: hora,
+        ministros: ministrosSelecionados
+    }).then(() => {
+        listarEscalas();
+        atualizarCalendario();
+        alert("Escala salva!");
+    }).catch(err => {
+        console.error("Erro ao salvar escala: ", err);
+        alert("Erro ao salvar escala.");
+    });
+};
+
+/* =========================================
+CARREGAR ESCALAS
+========================================= */
+
+function listarEscalas() {
+    let lista = document.getElementById("listaEscalasCards");
+    lista.innerHTML = ""; // Limpar antes de adicionar novas escalas
+
+    // Carregar as escalas do Firestore
+    db.collection("escalas").orderBy("data").get().then(snapshot => {
+        snapshot.forEach(doc => {
+            let e = doc.data();
+            lista.innerHTML += `
+            <div class="card" style="padding:14px;margin-bottom:10px">
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+                    <div>
+                        <strong>${formatarDataCompleta(e.data)}</strong> - ${e.hora}
+                    </div>
+                </div>
+                <div style="margin-top:10px;color:#555">${e.ministros.join(", ")}</div>
+                <button onclick="gerenciarEscala('${doc.id}')">Editar/Excluir</button>
+            </div>
+            `;
+        });
+    }).catch(err => {
+        console.error("Erro ao listar escalas: ", err);
     });
 }
 
@@ -103,55 +221,6 @@ window.gerenciarEscala = function(id) {
     } else {
         alert("Ação inválida! Digite 'editar' ou 'excluir'.");
     }
-}
-
-window.salvarEscala = function() {
-    let data = document.getElementById("dataEscala").value;
-    let hora = document.getElementById("horaEscala").value;
-
-    if (!data || !hora) {
-        alert("Preencha data e hora.");
-        return;
-    }
-
-    if (ministrosSelecionados.length === 0) {
-        alert("Selecione ministros.");
-        return;
-    }
-
-    db.collection("escalas").add({
-        data: data,
-        hora: hora,
-        ministros: ministrosSelecionados
-    }).then(() => {
-        listarEscalas();
-        atualizarCalendario();
-        alert("Escala salva!");
-    });
-};
-
-function listarEscalas() {
-    let lista = document.getElementById("listaEscalasCards");
-    lista.innerHTML = "";
-
-    db.collection("escalas").orderBy("data").get()
-    .then(snapshot => {
-        snapshot.forEach(doc => {
-            let e = doc.data();
-
-            lista.innerHTML += `
-            <div class="card" style="padding:14px;margin-bottom:10px">
-                <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
-                    <div>
-                        <strong>${formatarDataCompleta(e.data)}</strong> - ${e.hora}
-                    </div>
-                </div>
-                <div style="margin-top:10px;color:#555">${e.ministros.join(", ")}</div>
-                <button onclick="gerenciarEscala('${doc.id}')">Editar/Excluir</button>
-            </div>
-            `;
-        });
-    });
 }
 
 /* =========================================
