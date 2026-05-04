@@ -28,7 +28,7 @@ window.abrirTela = function(id) {
     }
 
     if(id === "escalas") {
-        carregarEscalas(); // Corrigido para chamar carregarEscalas
+        carregarEscalas(); 
         carregarMinistrosEscala();
         listarEscalas();
         iniciarCalendario();
@@ -97,52 +97,6 @@ function carregarMinistros() {
 }
 
 /* =========================================
-GERENCIAR MINISTRO (EDITAR/EXCLUIR)
-========================================= */
-window.gerenciarMinistro = function(id) {
-    let acao = prompt("Deseja editar ou excluir este ministro? (Digite 'editar' ou 'excluir')").toLowerCase();
-
-    if (acao === 'excluir') {
-        if (confirm("Você tem certeza que deseja excluir este ministro?")) {
-            // Excluir o ministro do Firestore
-            db.collection("ministros").doc(id).delete()
-                .then(() => {
-                    carregarMinistros(); // Atualizar a lista de ministros
-                    alert("Ministro excluído com sucesso!");
-                })
-                .catch(err => {
-                    console.error("Erro ao deletar ministro: ", err);
-                    alert("Erro ao excluir ministro.");
-                });
-        }
-    } else if (acao === 'editar') {
-        // Editar o ministro: solicitar novo nome, telefone e endereço
-        let novoNome = prompt("Digite o novo nome do ministro:");
-        let novoFone = prompt("Digite o novo telefone do ministro:");
-        let novoEndereco = prompt("Digite o novo endereço do ministro:");
-
-        if (novoNome && novoFone && novoEndereco) {
-            // Atualizar o ministro no Firestore
-            db.collection("ministros").doc(id).update({
-                nome: novoNome,
-                fone: novoFone,
-                endereco: novoEndereco
-            }).then(() => {
-                carregarMinistros(); // Atualizar a lista de ministros
-                alert("Ministro editado com sucesso!");
-            }).catch(err => {
-                console.error("Erro ao editar ministro: ", err);
-                alert("Erro ao editar ministro.");
-            });
-        } else {
-            alert("Por favor, preencha todos os campos.");
-        }
-    } else {
-        alert("Ação inválida! Digite 'editar' ou 'excluir'.");
-    }
-}
-
-/* =========================================
 ESCALAS
 ========================================= */
 function carregarMinistrosEscala() {
@@ -202,10 +156,6 @@ window.salvarEscala = function() {
     });
 };
 
-/* =========================================
-CARREGAR ESCALAS
-========================================= */
-
 function listarEscalas() {
     let lista = document.getElementById("listaEscalas");
     lista.innerHTML = ""; // Limpar antes de adicionar novas escalas
@@ -230,9 +180,6 @@ function listarEscalas() {
     });
 }
 
-/* =========================================
-FUNÇÃO DE FORMATAÇÃO DE DATA
-========================================= */
 function formatarDataCompleta(dataISO) {
     const data = new Date(dataISO + "T00:00:00");
     return data.toLocaleDateString("pt-BR", {
@@ -312,9 +259,6 @@ function ajustarTituloCalendario() {
         t.innerText.slice(1);
 }
 
-/* =========================================
-INÍCIO
-========================================= */
 window.onload = function() {
     abrirTela("dashboard");
 };
