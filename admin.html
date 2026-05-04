@@ -75,9 +75,26 @@
 <!-- ESCALAS -->
 <section id="escalas" class="tela hidden">
     <div class="card">
-        <h2>Selecione Ministros para a Escala</h2>
+        <h2>Cadastro de Escala</h2>
+
+        <label for="dataEscala">Data:</label>
+        <input type="date" id="dataEscala">
+
+        <label for="horaEscala">Hora:</label>
+        <input type="time" id="horaEscala">
+
+        <h3>Selecione os Ministros</h3>
         <div id="seletorMinistros">
             <!-- Ministros serão carregados aqui -->
+        </div>
+
+        <button onclick="salvarEscala()">Salvar Escala</button>
+    </div>
+
+    <div class="card">
+        <h2>Lista de Escalas</h2>
+        <div id="listaEscalasCards">
+            <!-- As escalas serão listadas aqui -->
         </div>
     </div>
 </section>
