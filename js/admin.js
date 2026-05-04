@@ -23,97 +23,79 @@ window.abrirTela = function(id) {
         targetScreen.classList.remove("hidden");
     }
 
-    if (id === "ministros") {
+    if(id === "ministros") {
         carregarMinistros();
     }
 
-    if (id === "escalas") {
+    if(id === "escalas") {
+        carregarEscalas();
         carregarMinistrosEscala();
         listarEscalas();
         iniciarCalendario();
     }
 
-    if (id === "relatorios") {
-        // Lógica do relatório (deixar vazio ou adicionar conteúdo)
+    if(id === "relatorios") {
+        // Lógica do relatório
     }
 };
 
 /* =========================================
-MINISTROS
+ESCALAS
 ========================================= */
-window.salvarMinistro = function() {
-    let nome = document.getElementById("nome").value.trim();
-    let fone = document.getElementById("fone").value.trim();
-    let endereco = document.getElementById("endereco").value.trim();
 
-    if (!nome) {
-        alert("Digite o nome.");
-        return;
-    }
-
-    db.collection("ministros").add({
-        nome: nome,
-        fone: fone,
-        endereco: endereco
-    }).then(() => {
-        document.getElementById("nome").value = "";
-        document.getElementById("fone").value = "";
-        document.getElementById("endereco").value = "";
-        carregarMinistros();
-        alert("Ministro salvo!");
-    });
-};
-
-function carregarMinistros() {
-    let lista = document.getElementById("listaMinistros");
+function carregarEscalas() {
+    let lista = document.getElementById("listaEscalas");
     lista.innerHTML = "";
 
-    db.collection("ministros").get().then(snapshot => {
+    db.collection("escalas").get().then(snapshot => {
         snapshot.forEach(doc => {
-            let m = doc.data();
+            let e = doc.data();
 
             lista.innerHTML += `
-            <tr data-id="${doc.id}" onclick="gerenciarMinistro('${doc.id}')">
-                <td style="padding: 8px; border: 1px solid #ddd;">${m.nome}</td>
-                <td style="padding: 8px; border: 1px solid #ddd;">${m.fone || ""}</td>
-                <td style="padding: 8px; border: 1px solid #ddd;">${m.endereco || ""}</td>
+            <tr data-id="${doc.id}" onclick="gerenciarEscala('${doc.id}')">
+                <td style="padding: 8px; border: 1px solid #ddd;">${formatarDataCompleta(e.data)}</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">${e.hora}</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">${e.ministros.join(", ")}</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">
+                    <button onclick="gerenciarEscala('${doc.id}')">Editar/Excluir</button>
+                </td>
             </tr>
             `;
         });
     });
 }
 
-window.gerenciarMinistro = function(id) {
-    let acao = prompt("Deseja editar ou excluir este ministro? (Digite 'editar' ou 'excluir')").toLowerCase();
+window.gerenciarEscala = function(id) {
+    let acao = prompt("Deseja editar ou excluir esta escala? (Digite 'editar' ou 'excluir')").toLowerCase();
 
     if (acao === 'excluir') {
-        if (confirm("Você tem certeza que deseja excluir este ministro?")) {
-            db.collection("ministros").doc(id).delete()
+        if (confirm("Você tem certeza que deseja excluir esta escala?")) {
+            db.collection("escalas").doc(id).delete()
                 .then(() => {
-                    carregarMinistros();
-                    alert("Ministro excluído com sucesso!");
+                    carregarEscalas();
+                    alert("Escala excluída com sucesso!");
                 })
                 .catch(err => {
-                    console.error("Erro ao deletar ministro: ", err);
-                    alert("Ocorreu um erro ao tentar deletar o ministro.");
+                    console.error("Erro ao deletar escala: ", err);
+                    alert("Ocorreu um erro ao tentar excluir a escala.");
                 });
         }
     } else if (acao === 'editar') {
-        let novoNome = prompt("Novo Nome:");
-        let novoFone = prompt("Novo Telefone:");
-        let novoEndereco = prompt("Novo Endereço:");
+        let data = prompt("Digite a nova data da escala:");
+        let hora = prompt("Digite a nova hora da escala:");
+        let ministros = prompt("Digite os ministros (separados por vírgula):");
 
-        if (novoNome && novoFone && novoEndereco) {
-            db.collection("ministros").doc(id).update({
-                nome: novoNome,
-                fone: novoFone,
-                endereco: novoEndereco
+        if (data && hora && ministros) {
+            db.collection("escalas").doc(id).update({
+                data: data,
+                hora: hora,
+                ministros: ministros.split(',').map(nome => nome.trim())
             }).then(() => {
-                carregarMinistros();
-                alert("Ministro editado com sucesso!");
+                carregarEscalas();
+                alert("Escala editada com sucesso!");
             }).catch(err => {
-                console.error("Erro ao editar ministro: ", err);
-                alert("Ocorreu um erro ao tentar editar o ministro.");
+                console.error("Erro ao editar escala: ", err);
+                alert("Ocorreu um erro ao tentar editar a escala.");
             });
         } else {
             alert("Por favor, preencha todos os campos.");
@@ -121,35 +103,7 @@ window.gerenciarMinistro = function(id) {
     } else {
         alert("Ação inválida! Digite 'editar' ou 'excluir'.");
     }
-};
-
-/* =========================================
-ESCALAS
-========================================= */
-function carregarMinistrosEscala() {
-    let box = document.getElementById("seletorMinistros");
-    box.innerHTML = "";
-    ministrosSelecionados = [];
-
-    db.collection("ministros").get().then(snapshot => {
-        snapshot.forEach(doc => {
-            let nome = doc.data().nome;
-            box.innerHTML += `
-            <div class="tag" onclick="toggleMinistro(this,'${nome}')">${nome}</div>
-            `;
-        });
-    });
 }
-
-window.toggleMinistro = function(el, nome) {
-    if (ministrosSelecionados.includes(nome)) {
-        ministrosSelecionados = ministrosSelecionados.filter(x => x !== nome);
-        el.classList.remove("active");
-    } else {
-        ministrosSelecionados.push(nome);
-        el.classList.add("active");
-    }
-};
 
 window.salvarEscala = function() {
     let data = document.getElementById("dataEscala").value;
@@ -193,6 +147,7 @@ function listarEscalas() {
                     </div>
                 </div>
                 <div style="margin-top:10px;color:#555">${e.ministros.join(", ")}</div>
+                <button onclick="gerenciarEscala('${doc.id}')">Editar/Excluir</button>
             </div>
             `;
         });
