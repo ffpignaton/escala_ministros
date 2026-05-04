@@ -72,27 +72,21 @@ window.salvarMinistro = function() {
     });
 };
 
-function carregarMinistros() {
-    let lista = document.getElementById("listaMinistros");
-    lista.innerHTML = ""; // Limpar lista antes de adicionar os novos ministros
+function carregarMinistrosEscala() {
+    let box = document.getElementById("seletorMinistros");
+    box.innerHTML = ""; // Limpar os ministros da escala
+    ministrosSelecionados = []; // Limpar ministros selecionados
 
     // Carregar ministros do Firestore
     db.collection("ministros").get().then(snapshot => {
         snapshot.forEach(doc => {
-            let m = doc.data();
-            lista.innerHTML += `
-            <tr data-id="${doc.id}">
-                <td style="padding: 8px; border: 1px solid #ddd;">${m.nome}</td>
-                <td style="padding: 8px; border: 1px solid #ddd;">${m.fone || ""}</td>
-                <td style="padding: 8px; border: 1px solid #ddd;">${m.endereco || ""}</td>
-                <td style="padding: 8px; border: 1px solid #ddd;">
-                    <button onclick="gerenciarMinistro('${doc.id}')">Editar/Excluir</button>
-                </td>
-            </tr>
+            let nome = doc.data().nome;
+            box.innerHTML += `
+            <div class="tag" onclick="toggleMinistro(this,'${nome}')">${nome}</div>
             `;
         });
     }).catch(err => {
-        console.error("Erro ao carregar ministros: ", err);
+        console.error("Erro ao carregar ministros para a escala: ", err);
     });
 }
 
